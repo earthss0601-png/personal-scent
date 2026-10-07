@@ -1,0 +1,1050 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>퍼스널 향찾기</title>
+<style>
+  :root{
+    --paper:#FBF6FB; --paper-2:#F3ECF6; --card:rgba(255,255,255,.72);
+    --ink:#3B3346; --ink-2:#5E5568; --mute:#9A8FA6; --hair:#E5DAEA;
+    --pink:#EE8FB2; --pink-soft:#F9C9DA; --pink-deep:#D2577F;
+    --citrus:#D9A935; --floral:#D47F95; --soap:#6E9FC6; --woody:#9A7550; --fruit:#D0685C;
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:"Malgun Gothic","맑은 고딕","Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:var(--sans); background:var(--paper); color:var(--ink);
+    -webkit-user-select:none; user-select:none; overflow-x:hidden;
+    background-image:
+      radial-gradient(700px 520px at 0% 0%, #FDE4DA 0%, transparent 65%),
+      radial-gradient(680px 520px at 100% 8%, #E6E0FA 0%, transparent 65%),
+      radial-gradient(760px 560px at 85% 70%, #DDF1EA 0%, transparent 65%),
+      radial-gradient(700px 560px at 5% 95%, #FFF1C9 0%, transparent 65%),
+      radial-gradient(600px 500px at 45% 45%, #E2EEFA 0%, transparent 70%);
+    background-attachment:fixed;
+  }
+  .en{font-family:var(--serif)}
+  .cap{font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--mute);font-weight:700}
+
+  /* ---------- 레이아웃 ---------- */
+  .frame{max-width:880px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:0 20px}
+  header{display:flex;justify-content:space-between;align-items:center;padding:22px 0 18px;border-bottom:1px solid var(--hair)}
+  header .mark{display:flex;align-items:center;gap:10px;cursor:default}
+  header .mark svg{width:26px;height:26px}
+  header .mark b{font-size:12px;letter-spacing:.3em;font-weight:800}
+  main{flex:1;display:flex;flex-direction:column;padding:28px 0 40px}
+  footer{border-top:1px solid var(--hair);padding:14px 0 20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex}
+  .reveal{opacity:0;transform:translateY(14px);animation:reveal .8s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes reveal{to{opacity:1;transform:none}}
+
+  /* ---------- 시작 ---------- */
+  .intro{justify-content:center;gap:0}
+  .intro .eyebrow{margin-bottom:26px}
+  .intro h1{font-size:clamp(46px,10vw,92px);line-height:.98;font-weight:400;letter-spacing:-.02em}
+  .intro h1 em{font-style:italic;color:var(--ink-2)}
+  .intro h2{font-size:clamp(26px,5vw,38px);font-weight:800;margin-top:18px;letter-spacing:-.02em}
+  .intro .lead{margin-top:18px;font-size:clamp(16px,3.2vw,19px);line-height:1.8;color:var(--ink-2);max-width:520px;word-break:keep-all}
+  .families{display:grid;grid-template-columns:repeat(5,1fr);margin:40px 0 36px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+  .families div{padding:18px 6px 16px;text-align:center;border-right:1px solid var(--hair);display:flex;flex-direction:column;align-items:center;gap:8px}
+  .families div:last-child{border-right:none}
+  .families svg{width:34px;height:34px}
+  .families .k{font-size:15px;font-weight:800}
+  .families .e{font-size:12px;color:var(--mute);font-style:italic}
+  .families .n{font-size:10px;letter-spacing:.2em;color:var(--mute)}
+  .start-row{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .btn{
+    font:inherit;font-size:18px;font-weight:800;letter-spacing:.04em;cursor:pointer;border:1px solid var(--ink);
+    background:var(--ink);color:var(--paper);padding:20px 38px;display:inline-flex;align-items:center;gap:18px;
+    transition:background .25s, color .25s
+  }
+  .btn .arr{display:inline-block;transition:transform .25s}
+  .btn:hover .arr,.btn:active .arr{transform:translateX(6px)}
+  .btn:active{background:#000}
+  .btn.line{background:transparent;color:var(--ink)}
+  .meta{font-size:14px;color:var(--mute);line-height:1.7}
+
+  /* ---------- 질문 ---------- */
+  .qtop{display:flex;align-items:center;gap:16px;margin-bottom:34px}
+  .back{font:inherit;font-size:14px;font-weight:700;letter-spacing:.06em;background:none;border:none;color:var(--mute);cursor:pointer;padding:6px 0;min-width:60px;text-align:left}
+  .back:disabled{visibility:hidden}
+  .rail{flex:1;display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+  .rail i{height:3px;background:var(--hair);position:relative;overflow:hidden}
+  .rail i::after{content:"";position:absolute;inset:0;background:var(--pink);transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .rail i.on::after{transform:scaleX(1)}
+  .qcount{font-size:15px;min-width:60px;text-align:right;color:var(--ink-2)}
+  .qcount b{font-size:22px;color:var(--ink);font-weight:400}
+  .qblock{display:grid;grid-template-columns:120px 1fr;gap:10px 28px}
+  .qno{font-family:var(--serif);font-size:84px;line-height:.9;color:var(--ink);font-weight:400}
+  .qcat{margin-bottom:12px}
+  .qtext{font-size:clamp(25px,5vw,34px);font-weight:800;line-height:1.38;letter-spacing:-.02em;word-break:keep-all}
+  .options{margin-top:34px;border-top:1px solid var(--ink)}
+  .opt{
+    font:inherit;width:100%;display:grid;grid-template-columns:52px 1fr 28px;align-items:center;text-align:left;
+    background:transparent;border:none;border-bottom:1px solid var(--hair);padding:20px 4px;cursor:pointer;color:var(--ink);
+    font-size:clamp(17px,3.4vw,20px);line-height:1.45;word-break:keep-all;position:relative;
+    opacity:0;transform:translateY(8px);animation:reveal .55s cubic-bezier(.2,.7,.2,1) forwards
+  }
+  .opt::before{content:"";position:absolute;inset:0;background:var(--pink-soft);transform:scaleY(0);transform-origin:bottom;transition:transform .28s cubic-bezier(.2,.7,.2,1);z-index:-1}
+  .opt{z-index:0}
+  .opt .l{font-family:var(--serif);font-size:20px;font-style:italic;color:var(--mute);transition:color .2s}
+  .opt .chk{width:22px;height:22px;border:1px solid var(--hair);border-radius:50%;justify-self:end;transition:all .2s}
+  .opt:hover .chk{border-color:var(--ink)}
+  .opt.picked{color:var(--ink);font-weight:700}
+  .opt.picked::before{transform:scaleY(1)}
+  .opt.picked .l{color:var(--pink-deep)}
+  .opt.picked .chk{border-color:var(--pink-deep);background:radial-gradient(circle,var(--pink-deep) 0 5px,transparent 6px)}
+  @media (max-width:560px){
+    .qblock{grid-template-columns:1fr}
+    .qno{font-size:56px}
+    .families .e,.families .n{display:none}
+    .families .k{font-size:12.5px;letter-spacing:-.04em;white-space:nowrap}
+    .families svg{width:28px;height:28px}
+    header .cap{letter-spacing:.12em;font-size:10px;text-align:right}
+    .cap{letter-spacing:.18em}
+    .lead br{display:none}
+  }
+
+  /* ---------- 분석 ---------- */
+  .analyze{justify-content:center;max-width:520px;width:100%;margin:0 auto}
+  .analyze h3{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(30px,6vw,42px);margin:12px 0 6px}
+  .analyze p{color:var(--ink-2);font-size:16px;margin-bottom:34px}
+  .arow{display:grid;grid-template-columns:110px 1fr 48px;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--hair);font-size:15px}
+  .arow .t{height:2px;background:var(--hair);position:relative}
+  .arow .t i{position:absolute;left:0;top:-1px;height:4px;width:0;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+  .arow .v{text-align:right;font-family:var(--serif);font-size:17px}
+  .scanline{height:1px;background:linear-gradient(90deg,transparent,var(--ink),transparent);margin-top:30px;animation:scan 1.4s ease-in-out infinite}
+  @keyframes scan{0%{transform:scaleX(.1);opacity:.2}50%{transform:scaleX(1);opacity:1}100%{transform:scaleX(.1);opacity:.2}}
+
+  /* ---------- 결과 리포트 ---------- */
+  .report{gap:0}
+  .rhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--ink)}
+  .rhead .ttl{font-family:var(--serif);font-size:15px;letter-spacing:.24em;text-transform:uppercase}
+  .rhead .no{font-family:var(--serif);font-size:14px;color:var(--ink-2);text-align:right;line-height:1.6}
+  .label{
+    margin:28px 0 0;background:var(--card);border:1px solid var(--hair);position:relative;overflow:hidden;
+    display:grid;grid-template-columns:1fr 200px;
+  }
+  .label::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--tone)}
+  .label .main{padding:34px 30px 30px 40px}
+  .label .fam{display:flex;align-items:center;gap:10px;color:var(--tone)}
+  .label .fam svg{width:22px;height:22px}
+  .label .big{font-size:clamp(46px,9vw,78px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-top:14px}
+  .label .big-en{font-family:var(--serif);font-style:italic;font-size:clamp(20px,3.6vw,26px);color:var(--ink-2);margin-top:4px}
+  .label .tagline{margin-top:22px;font-size:clamp(18px,3.4vw,21px);font-weight:700;line-height:1.5;word-break:keep-all}
+  .label .kw{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .label .kw span{font-size:14px;border:1px solid var(--hair);padding:6px 12px;color:var(--ink-2);background:var(--paper)}
+  .label .side{border-left:1px solid var(--hair);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;background:var(--soft)}
+  .label .side .num{font-family:var(--serif);font-size:88px;line-height:1;color:var(--tone)}
+  .label .side .sub{font-size:13px;text-align:center;line-height:1.6;color:var(--ink-2);font-weight:700}
+  @media (max-width:640px){
+    .label{grid-template-columns:1fr}
+    .label .side{border-left:none;border-top:1px solid var(--hair);flex-direction:row;justify-content:flex-start;gap:18px}
+    .label .side .num{font-size:60px}
+    .label .side .sub{text-align:left}
+    .label .main{padding:28px 22px 24px 30px}
+  }
+
+  .sec{padding:30px 0 6px}
+  .sec-h{display:flex;align-items:baseline;gap:14px;padding-bottom:12px;border-bottom:1px solid var(--hair);margin-bottom:20px}
+  .sec-h .i{font-family:var(--serif);font-style:italic;color:var(--mute);font-size:15px}
+  .sec-h h4{font-size:18px;font-weight:800}
+  .sec-h .cap{margin-left:auto}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+  @media (max-width:640px){.two{grid-template-columns:1fr;gap:10px}}
+  .prose{font-size:17px;line-height:1.95;color:var(--ink-2);word-break:keep-all}
+  .prose b{color:var(--ink)}
+
+  /* 노트 피라미드 */
+  .pyr{display:grid;gap:0}
+  .pyr .tier{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--hair);align-items:center}
+  .pyr .tier:last-child{border-bottom:none}
+  .pyr .tier .nm{font-family:var(--serif);font-style:italic;font-size:16px}
+  .pyr .tier .nm small{display:block;white-space:nowrap;font-family:var(--sans);font-style:normal;font-size:11px;color:var(--mute);letter-spacing:.1em;margin-top:2px}
+  .pyr .tier .nt{font-size:16px;font-weight:700;color:var(--ink)}
+  .pyr .tier .nt span{color:var(--hair);margin:0 8px;font-weight:400}
+
+  /* 레이더 */
+  .radar{width:100%;max-width:360px;margin:0 auto;display:block;overflow:visible}
+  .radar .shape{transform-origin:180px 170px;transform:scale(0);transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}
+  .radar.on .shape{transform:scale(1)}
+  .radar text{font-family:var(--sans);font-size:13px;font-weight:700;fill:var(--ink)}
+  .radar text.p{font-family:var(--serif);font-size:12px;font-weight:400;fill:var(--mute)}
+
+  /* 성격 스케일 */
+  .scale{padding:12px 0}
+  .scale .ends{display:flex;justify-content:space-between;font-size:14px;color:var(--ink-2);margin-bottom:10px;font-weight:700}
+  .scale .bar{position:relative;height:1px;background:var(--ink)}
+  .scale .bar::before,.scale .bar::after{content:"";position:absolute;top:-4px;width:1px;height:9px;background:var(--ink)}
+  .scale .bar::before{left:0}.scale .bar::after{right:0}
+  .scale .tick{position:absolute;top:-3px;width:1px;height:7px;background:var(--hair)}
+  .scale .dot{position:absolute;top:-7px;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;background:var(--tone);left:50%;transition:left 1.2s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 0 4px var(--card)}
+
+  /* 블렌딩 제안 */
+  .blendbar{display:flex;height:46px;margin:6px 0 12px;border:1px solid var(--ink);overflow:hidden}
+  .blendbar div{display:flex;align-items:center;padding:0 14px;color:#fff;font-weight:800;font-size:15px;white-space:nowrap;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+  .blendbar div span{font-family:var(--serif);font-weight:400;margin-left:8px;opacity:.9}
+
+  .fine{font-size:13px;color:var(--mute);line-height:1.7;margin-top:8px}
+  .end-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:34px;padding-top:22px;border-top:1px solid var(--ink)}
+
+  /* 운영자 통계 */
+  .modal{position:fixed;inset:0;background:rgba(30,27,24,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+  .modal.show{display:flex}
+  .modal .box{background:#fff;padding:28px;width:min(420px,100%);border:1px solid var(--hair)}
+  .modal h3{font-size:19px;margin:8px 0 4px}
+  .modal .hint{font-size:13px;color:var(--mute);margin-bottom:14px}
+  .modal .row{display:flex;justify-content:space-between;font-size:16px;padding:11px 0;border-bottom:1px solid var(--hair)}
+  .modal .row b{font-family:var(--serif);font-size:19px;font-weight:400}
+  .modal .btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+  .modal .btns button{font:inherit;font-size:14px;font-weight:700;padding:10px 18px;border:1px solid var(--ink);background:transparent;cursor:pointer}
+  .modal .btns .close{background:var(--ink);color:var(--paper)}
+
+  /* =============== 애니메이션 & 일러스트 =============== */
+  /* 떠다니는 파스텔 빛 */
+  .orbs{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .orbs i{position:absolute;border-radius:50%;filter:blur(50px);opacity:.55;animation:drift 18s ease-in-out infinite alternate}
+  .orbs i:nth-child(1){width:340px;height:340px;background:#FFC9DC;left:-80px;top:10%}
+  .orbs i:nth-child(2){width:300px;height:300px;background:#D9CCFF;right:-60px;top:30%;animation-duration:22s}
+  .orbs i:nth-child(3){width:360px;height:360px;background:#C8EEDD;left:20%;bottom:-120px;animation-duration:26s}
+  @keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,-40px) scale(1.15)}100%{transform:translate(-40px,50px) scale(.95)}}
+  .bubbles{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+  .bubbles b{position:absolute;bottom:-40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.9);background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9),rgba(255,255,255,.15) 60%);animation:rise linear infinite}
+  @keyframes rise{to{transform:translate(var(--sx),-115vh)}}
+
+  /* 시작 화면 히어로 */
+  .intro-grid{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:center}
+  .hero-art{position:relative;width:300px;height:340px;justify-self:center}
+  .hero-art .bottle{position:absolute;left:50px;top:30px;width:200px;animation:sway 5s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(3deg) translateY(-10px)}}
+  .hero-art .glow{position:absolute;left:40px;top:90px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#FFD6E5 0%,transparent 70%);animation:pulseGlow 3s ease-in-out infinite}
+  @keyframes pulseGlow{50%{transform:scale(1.15);opacity:.6}}
+  .ing{position:absolute;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.95);box-shadow:0 8px 24px rgba(120,90,140,.15);backdrop-filter:blur(6px);
+    animation:floaty 4s ease-in-out infinite}
+  .ing svg{width:32px;height:32px}
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-14px) rotate(6deg)}}
+  .sparkle{position:absolute;width:16px;height:16px;animation:twinkle 2.2s ease-in-out infinite}
+  @keyframes twinkle{0%,100%{transform:scale(.3) rotate(0);opacity:0}50%{transform:scale(1) rotate(90deg);opacity:1}}
+  @media (max-width:760px){
+    .intro-grid{grid-template-columns:1fr}
+    .hero-art{order:-1;transform:scale(.78);margin:-36px 0 -6px}
+  }
+
+  /* 향수병 SVG 내부 */
+  .wave{animation:wave 3s linear infinite}
+  .wave.w2{animation-duration:4.5s;animation-direction:reverse}
+  @keyframes wave{to{transform:translateX(100px)}}
+  .bub{animation:bub 2.6s ease-in infinite;transform-box:fill-box}
+  @keyframes bub{0%{transform:translateY(0);opacity:0}20%{opacity:.9}100%{transform:translateY(-90px);opacity:0}}
+  .mist{transform-box:fill-box;transform-origin:center;opacity:0;animation:mist 3.2s ease-out infinite}
+  @keyframes mist{0%,55%{opacity:0;transform:translate(0,0) scale(.3)}60%{opacity:.9}100%{opacity:0;transform:translate(var(--mx),var(--my)) scale(1.6)}}
+  .cap-press{animation:press 3.2s ease-in-out infinite;transform-box:fill-box}
+  @keyframes press{0%,50%,62%,100%{transform:translateY(0)}54%,58%{transform:translateY(5px)}}
+
+  /* 시작 버튼 반짝 */
+  .btn{position:relative;overflow:hidden}
+  .btn.shine::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:shine 3s ease-in-out infinite}
+  @keyframes shine{0%,60%{left:-60%}100%{left:130%}}
+
+  /* 보기 터치 물결 */
+  .opt{overflow:hidden}
+  .ripple{position:absolute;border-radius:50%;background:rgba(238,143,178,.45);transform:scale(0);animation:ripple .6s ease-out forwards;pointer-events:none;z-index:-1}
+  @keyframes ripple{to{transform:scale(1);opacity:0}}
+  .qno{display:inline-block}
+  .qno.flip{animation:numIn .6s cubic-bezier(.3,1.5,.5,1)}
+  @keyframes numIn{from{transform:rotateX(90deg);opacity:0}to{transform:none;opacity:1}}
+
+  /* 분석 화면 병 */
+  .abottle{width:150px;margin:0 auto 18px;display:block}
+  .rising{animation:rising 2.6s cubic-bezier(.3,.7,.3,1) forwards}
+  @keyframes rising{from{transform:translateY(150px)}to{transform:translateY(0)}}
+  .dropin{position:absolute;width:30px;height:30px;left:50%;margin-left:-15px;top:-10px;opacity:0;animation:dropin 1s ease-in forwards}
+  .dropin svg{width:30px;height:30px}
+  @keyframes dropin{0%{opacity:0;transform:translateY(-40px) rotate(0)}30%{opacity:1}100%{opacity:0;transform:translateY(90px) rotate(200deg)}}
+
+  /* 결과 카드 뒤집기 */
+  .flip{perspective:1600px;margin-top:28px}
+  .flip-inner{display:grid;transform-style:preserve-3d;transition:transform 1.1s cubic-bezier(.3,1.3,.5,1)}
+  .flip-inner > *{grid-area:1/1;-webkit-backface-visibility:hidden;backface-visibility:hidden}
+  .flip .label{margin:0;transform:rotateY(180deg)}
+  .flip.open .flip-inner{transform:rotateY(180deg)}
+  .cover{
+    position:relative;overflow:hidden;cursor:pointer;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;
+    background:linear-gradient(135deg,#FFD3E2 0%,#E3D6FF 50%,#CDEFE3 100%);border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 18px 40px rgba(150,110,170,.25);animation:wobble 2.4s ease-in-out infinite
+  }
+  .flip.open .cover{animation:none}
+  @keyframes wobble{0%,100%{transform:rotate(-1deg) scale(1)}50%{transform:rotate(1deg) scale(1.02)}}
+  .cover::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-20deg);animation:shine 2.4s ease-in-out infinite}
+  .cover .pat{position:absolute;inset:0;opacity:.35;display:grid;grid-template-columns:repeat(6,1fr);place-items:center;pointer-events:none}
+  .cover .pat svg{width:30px;height:30px}
+  .cover .q{font-family:var(--serif);font-size:96px;line-height:1;color:#fff;text-shadow:0 6px 20px rgba(160,100,160,.35);position:relative}
+  .cover .t{font-size:22px;font-weight:800;position:relative}
+  .cover .s{font-size:15px;color:var(--ink-2);position:relative;animation:blink 1.4s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.35}}
+  .label{grid-template-columns:190px 1fr 180px !important}
+  .label .art{display:flex;align-items:center;justify-content:center;padding:20px 0 20px 16px;position:relative}
+  .label .art svg.bottle{width:150px;animation:sway 5s ease-in-out infinite}
+  @media (max-width:760px){
+    .label{grid-template-columns:1fr !important}
+    .label .art{padding:26px 0 0}
+    .label .art svg.bottle{width:130px}
+  }
+  .rest{opacity:0;transform:translateY(20px);transition:opacity .8s ease .3s, transform .8s ease .3s;pointer-events:none}
+  .rest.show{opacity:1;transform:none;pointer-events:auto}
+
+  /* 결과 공개 파티클 */
+  .burst{position:fixed;z-index:30;pointer-events:none;width:36px;height:36px;margin:-18px 0 0 -18px;animation:burst 1.4s cubic-bezier(.2,.8,.3,1) forwards}
+  .burst svg{width:100%;height:100%}
+  @keyframes burst{0%{transform:translate(0,0) scale(.2) rotate(0);opacity:1}80%{opacity:1}100%{transform:translate(var(--bx),var(--by)) scale(1) rotate(var(--br));opacity:0}}
+  .petal{position:fixed;top:-20px;z-index:29;pointer-events:none;width:12px;height:16px;border-radius:60% 0 60% 0;animation:petal linear forwards}
+  @keyframes petal{to{transform:translate(var(--px),110vh) rotate(var(--pr))}}
+
+  /* =============== 향 과학 퀴즈 =============== */
+  .sci-btn{background:linear-gradient(135deg,#F7A8C4,#C9B6F5);border-color:transparent;color:#fff;box-shadow:0 8px 20px rgba(214,130,170,.3)}
+  .sci-btn:active{background:linear-gradient(135deg,#EE8FB2,#B8A2EE)}
+  .sci-btn small{font-size:12px;font-weight:700;background:rgba(255,255,255,.3);padding:4px 8px;border-radius:999px;letter-spacing:0}
+  .flask-ic{width:20px;height:22px;display:inline-block;margin-right:-8px;
+    background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 22' fill='none' stroke='white' stroke-width='1.6' stroke-linejoin='round'%3E%3Cpath d='M7 1h6M8 1v7L2 19a1.5 1.5 0 0 0 1.3 2h13.4A1.5 1.5 0 0 0 18 19L12 8V1'/%3E%3Cpath d='M4.5 15h11'/%3E%3C/svg%3E");
+    animation:bubbleIc 2s ease-in-out infinite}
+  @keyframes bubbleIc{50%{transform:rotate(-12deg)}}
+  .sdots{flex:1;display:flex;gap:10px;justify-content:center}
+  .sdots i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--hair);background:rgba(255,255,255,.6);transition:all .3s}
+  .sdots i.cur{border-color:var(--pink);transform:scale(1.25)}
+  .sdots i.ok{background:#7CCFAE;border-color:#7CCFAE}
+  .sdots i.no{background:#F09A9A;border-color:#F09A9A}
+  .sdots.big{justify-content:center;margin:14px 0 6px}
+  .sdots.big i{width:20px;height:20px}
+  .options.ox{display:grid;grid-template-columns:1fr 1fr;gap:16px;border-top:none}
+  .options.ox .opt{grid-template-columns:1fr;justify-items:center;border:1px solid var(--hair);background:rgba(255,255,255,.55);padding:26px 0;font-family:var(--serif);font-size:64px;line-height:1}
+  .options.ox .opt .l,.options.ox .opt .chk{display:none}
+  .opt:disabled{cursor:default}
+  .opt.correct::before{transform:scaleY(1);background:#CDEFE3}
+  .opt.correct .chk{border-color:#3FA27E;background:radial-gradient(circle,#3FA27E 0 5px,transparent 6px)}
+  .opt.correct .l{color:#3FA27E}
+  .opt.wrong::before{transform:scaleY(1);background:#FBD5D5}
+  .opt.wrong{animation:shakeX .45s ease both !important;opacity:1}
+  @keyframes shakeX{0%,100%{transform:none}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .6s ease, opacity .4s ease, margin .4s}
+  .explain.show{max-height:600px;opacity:1;margin-top:24px}
+  .explain .verdict{display:inline-block;font-weight:800;font-size:18px;padding:8px 16px;border-radius:999px;margin-bottom:12px;animation:popV .5s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes popV{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+  .explain .verdict.ok{background:#CDEFE3;color:#22795A}
+  .explain .verdict.no{background:#FBD5D5;color:#B33D3D}
+  .explain p{font-size:17px;line-height:1.85;color:var(--ink-2);word-break:keep-all;background:rgba(255,255,255,.6);border-left:4px solid var(--pink);padding:16px 18px;margin-bottom:18px}
+  .explain p b{color:var(--ink)}
+  .sci-card{margin-top:28px;text-align:center;padding:34px 20px 30px;background:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.95);box-shadow:0 18px 40px rgba(150,110,170,.18)}
+  .sci-card.pass{background:linear-gradient(135deg,rgba(255,224,236,.85),rgba(232,224,255,.85) 55%,rgba(214,242,231,.85))}
+  .snack{width:230px;display:block;margin:0 auto 6px}
+  .snack .sn1{animation:snackBob 2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .snack .sn2{animation:snackBob 2s .3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .snack .sn3{animation:snackBob 2s .6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  @keyframes snackBob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
+  .retry-ic svg{width:70px;height:70px;animation:floaty 3s ease-in-out infinite}
+  .sci-card .score b{font-size:96px;line-height:1}
+  .sci-card .score span{font-size:36px;color:var(--mute)}
+  .sci-card .msg{font-size:clamp(22px,4.6vw,30px);font-weight:800;margin-top:8px;word-break:keep-all}
+  .sci-card.pass .msg{color:#C2477A}
+  .sci-card .sub{font-size:16px;color:var(--ink-2);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="orbs"><i></i><i></i><i></i></div>
+<div class="bubbles" id="bubbles"></div>
+<div class="frame">
+  <header>
+    <div class="mark" id="secret">
+      <svg viewBox="0 0 26 26" fill="none" stroke="#1E1B18" stroke-width="1.2"><rect x="9" y="1.5" width="8" height="5"/><path d="M11 6.5v2.5M15 6.5v2.5"/><rect x="4" y="9" width="18" height="15.5" rx="3"/><path d="M4 17h18"/></svg>
+      <b>SCENT SCIENCE</b>
+    </div>
+    <span class="cap">2026 봉화 교육 한마당</span>
+  </header>
+
+  <main>
+    <!-- 시작 -->
+    <section class="screen intro active" id="intro">
+      <div class="intro-grid">
+        <div>
+          <div class="cap eyebrow reveal">Personal Scent Profiling · No. 2026</div>
+          <h1 class="en reveal" style="animation-delay:.1s">Find your<br><em>own scent.</em></h1>
+          <h2 class="reveal" style="animation-delay:.2s">퍼스널 향찾기</h2>
+          <p class="lead reveal" style="animation-delay:.3s">여덟 가지 질문으로 당신의 후각 취향을 분석해 <br>다섯 가지 향 계열 중 가장 잘 어울리는 향과 분위기를 찾아 드립니다.</p>
+        </div>
+        <div class="hero-art reveal" style="animation-delay:.25s" id="heroArt"></div>
+      </div>
+      <div class="families reveal" style="animation-delay:.4s" id="families"></div>
+      <div class="start-row reveal" style="animation-delay:.5s">
+        <button class="btn shine" id="startBtn">진단 시작하기 <span class="arr">→</span></button>
+        <button class="btn sci-btn" id="sciStartBtn"><span class="flask-ic"></span>향 과학 퀴즈 <small>간식 도전</small></button>
+        <div class="meta">2026. 11. 4. · 8 Questions · 약 2분 소요<br>결과에 맞는 10ml 향수를 받아 가세요</div>
+      </div>
+    </section>
+
+    <!-- 질문 -->
+    <section class="screen" id="quiz">
+      <div class="qtop">
+        <button class="back" id="backBtn">← 이전</button>
+        <div class="rail" id="rail"></div>
+        <div class="qcount"><b class="en" id="qcur">1</b> / 8</div>
+      </div>
+      <div class="qblock" id="qblock">
+        <div class="qno en" id="qno">01</div>
+        <div>
+          <div class="cap qcat" id="qcat"></div>
+          <h2 class="qtext" id="qtext"></h2>
+        </div>
+      </div>
+      <div class="options" id="options"></div>
+    </section>
+
+    <!-- 분석 -->
+    <section class="screen analyze" id="analyze">
+      <div style="position:relative" id="abox"></div>
+      <div class="cap">Analyzing olfactive profile</div>
+      <h3>Blending your notes…</h3>
+      <p>응답을 바탕으로 다섯 가지 향 계열의 선호도를 계산하고 있습니다.</p>
+      <div id="arows"></div>
+      <div class="scanline"></div>
+    </section>
+
+    <!-- 향 과학 퀴즈 -->
+    <section class="screen" id="sci">
+      <div class="qtop">
+        <button class="back" id="sciHome">← 처음</button>
+        <div class="sdots" id="sdots"></div>
+        <div class="qcount"><b class="en" id="scur">1</b> / 5</div>
+      </div>
+      <div class="qblock reveal" id="sblock">
+        <div class="qno en" id="sno">01</div>
+        <div>
+          <div class="cap qcat">Science Quiz · 향의 과학</div>
+          <h2 class="qtext" id="stext"></h2>
+        </div>
+      </div>
+      <div class="options" id="soptions"></div>
+      <div class="explain" id="explain"></div>
+    </section>
+
+    <!-- 퀴즈 결과 -->
+    <section class="screen" id="sciResult"></section>
+
+    <!-- 결과 -->
+    <section class="screen report" id="report"></section>
+  </main>
+
+  <footer>
+    <span class="cap">춘양중학교 · 센트 사이언스 동아리</span>
+    <span class="cap">Scent Science Lab, Chunyang Middle School</span>
+  </footer>
+</div>
+
+<div class="modal" id="stats">
+  <div class="box">
+    <div class="cap">Staff only</div>
+    <h3>운영자 통계</h3>
+    <p class="hint">이 기기에서 진단이 완료된 횟수 (향수 재고 확인용)</p>
+    <div id="statRows"></div>
+    <div class="btns"><button id="statReset">초기화</button><button class="close" id="statClose">닫기</button></div>
+  </div>
+</div>
+
+<script>
+/* ===================== 아이콘 (단선 일러스트) ===================== */
+const ICON = {
+  citrus:'<circle cx="16" cy="16" r="13"/><circle cx="16" cy="16" r="10"/><path d="M16 6v20M7.3 11l17.4 10M7.3 21l17.4-10"/>',
+  floral:'<circle cx="16" cy="16" r="3"/><ellipse cx="16" cy="8" rx="4" ry="6"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(72 16 16)"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(144 16 16)"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(216 16 16)"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(288 16 16)"/>',
+  soap:'<circle cx="12" cy="18" r="8"/><circle cx="23" cy="10" r="5"/><circle cx="24" cy="23" r="3"/><path d="M8 14.5a5 5 0 0 1 4-2.5"/>',
+  woody:'<circle cx="16" cy="16" r="13"/><circle cx="16.5" cy="16.5" r="9"/><circle cx="17" cy="17" r="5"/><circle cx="17.3" cy="17.3" r="1.6"/><path d="M16 3l1.5 6"/>',
+  fruit:'<circle cx="10" cy="22" r="6"/><circle cx="22" cy="22" r="6"/><path d="M10 16c2-6 6-10 8-12M22 16c-1-5-2-9-4-12"/><path d="M18 4c4-1 8 1 9 4-4 1-7 0-9-4z"/>'
+};
+function icon(k, color){ return `<svg viewBox="0 0 32 32" fill="none" stroke="${color||'currentColor'}" stroke-width="1.3" stroke-linecap="round">${ICON[k]}</svg>`; }
+
+/* ===================== 향수병 일러스트 =====================
+   fill: 색 하나(문자열) 또는 [[색,비율%],...] 그라데이션
+   opt.label: 병 라벨 글자, opt.mist: 분사 미스트, opt.rising: 차오르는 애니메이션 */
+let uid=0;
+function bottleArt(fill, opt={}){
+  const id='b'+(++uid);
+  let grad;
+  if(Array.isArray(fill)){
+    let acc=0; const stops=[];
+    fill.forEach(([c,p])=>{ stops.push(`<stop offset="${acc}%" stop-color="${c}"/>`); acc+=p; stops.push(`<stop offset="${Math.min(acc,100)}%" stop-color="${c}"/>`); });
+    grad=`<linearGradient id="${id}g" x1="0" y1="1" x2="0" y2="0">${stops.join('')}</linearGradient>`;
+  } else {
+    grad=`<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${fill}" stop-opacity=".75"/><stop offset="1" stop-color="${fill}"/></linearGradient>`;
+  }
+  const wavePath=y=>`M-200 ${y} Q-175 ${y-10} -150 ${y} T-100 ${y} T-50 ${y} T0 ${y} T50 ${y} T100 ${y} T150 ${y} T200 ${y} T250 ${y} T300 ${y} V270 H-200 Z`;
+  const bubbles=[60,95,130,80,115].map((x,i)=>`<circle class="bub" cx="${x}" cy="${230-i*6}" r="${3+i%3}" fill="#fff" opacity=".8" style="animation-delay:${i*0.5}s"/>`).join('');
+  const mist=opt.mist ? [[46,-14],[62,-4],[54,-26],[70,-18],[40,2]].map(([mx,my],i)=>
+    `<circle class="mist" cx="142" cy="33" r="${4+i%3*2}" fill="#fff" stroke="#F3C7D8" stroke-width="1" style="--mx:${mx}px;--my:${my}px;animation-delay:${i*0.05}s"/>`).join('') : '';
+  const label=opt.label ? `<rect x="58" y="150" width="84" height="58" rx="6" fill="#fff" opacity=".92"/>
+    <text x="100" y="172" text-anchor="middle" font-family="Georgia,serif" font-size="11" letter-spacing="2" fill="#5E5568">${opt.label[0]}</text>
+    <text x="100" y="194" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="17" fill="#3B3346">${opt.label[1]}</text>` : '';
+  return `<svg class="bottle" viewBox="0 0 200 270" aria-hidden="true">
+    <defs>${grad}<clipPath id="${id}c"><rect x="30" y="82" width="140" height="170" rx="36"/></clipPath>
+      <linearGradient id="${id}s" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient></defs>
+    <ellipse cx="100" cy="258" rx="70" ry="8" fill="#B9A3C6" opacity=".25"/>
+    <g class="${opt.mist?'cap-press':''}">
+      <rect x="76" y="16" width="48" height="38" rx="8" fill="#3B3346"/>
+      <rect x="124" y="28" width="16" height="10" rx="3" fill="#3B3346"/>
+      <rect x="84" y="22" width="8" height="26" rx="4" fill="#fff" opacity=".25"/>
+    </g>
+    <rect x="88" y="52" width="24" height="32" fill="#fff" opacity=".75" stroke="#EBDDEF" stroke-width="2"/>
+    <rect x="30" y="82" width="140" height="170" rx="36" fill="rgba(255,255,255,.55)" stroke="#fff" stroke-width="4"/>
+    <g clip-path="url(#${id}c)">
+      <g class="${opt.rising?'rising':''}">
+        <path class="wave w2" d="${wavePath(opt.level||128)}" fill="url(#${id}g)" opacity=".45"/>
+        <path class="wave" d="${wavePath((opt.level||128)+6)}" fill="url(#${id}g)" opacity=".9"/>
+      </g>
+      ${bubbles}
+    </g>
+    <rect x="44" y="98" width="12" height="110" rx="6" fill="url(#${id}s)" opacity=".7"/>
+    ${label}${mist}
+  </svg>`;
+}
+const SPARK='<svg class="sparkle" viewBox="0 0 16 16"><path d="M8 0 L9.5 6.5 L16 8 L9.5 9.5 L8 16 L6.5 9.5 L0 8 L6.5 6.5Z" fill="#fff" stroke="#F0B3CA" stroke-width=".6"/></svg>';
+
+/* ===================== 향 계열 정보 ===================== */
+const SCENTS = {
+  citrus:{ no:1, name:'시트러스', en:'Citrus', color:'#C29A2B', soft:'#F4EBD2',
+    tagline:'햇살처럼 맑고 경쾌한 첫인상', mood:['상큼한','활기찬','긍정적인','산뜻한'],
+    family:'레몬·오렌지·자몽 같은 감귤류 껍질에서 얻는 향 계열이에요. 분자가 가볍고 휘발성이 높아 뿌리는 순간 가장 먼저 퍼지며, 향수의 <b>첫인상(탑 노트)</b>을 책임집니다.',
+    persona:'상큼하고 가벼운 향에 끌리는 사람은 대체로 <b>밝고 에너지가 넘치는 분위기</b>를 가지고 있어요. 새로운 것에 먼저 다가가고, 함께 있으면 주변까지 환해지는 비타민 같은 존재예요.',
+    top:['베르가못','레몬','자몽'], mid:['네롤리','그린티'], base:['화이트 머스크','베티버'],
+    axes:[1,1,3], when:'등교하는 아침, 시험 전 기분 전환, 운동 전후' },
+  floral:{ no:2, name:'플로럴', en:'Floral', color:'#B9707F', soft:'#F4E3E5',
+    tagline:'꽃잎처럼 섬세하고 다정한 분위기', mood:['화사한','다정한','섬세한','우아한'],
+    family:'장미·자스민·프리지아 같은 꽃에서 영감을 받은 향 계열로, 향수에서 가장 오래되고 다양한 계열이에요. 주로 <b>향의 심장(미들 노트)</b>을 이루며 풍성하고 부드럽게 퍼집니다.',
+    persona:'꽃향기에 끌리는 사람은 <b>감수성이 풍부하고 다정한 분위기</b>를 가지고 있어요. 작은 것에도 마음을 쓰고, 아름다운 것을 오래 바라볼 줄 아는 따뜻한 사람이에요.',
+    top:['프리지아','리치'], mid:['장미','자스민','피오니'], base:['화이트 머스크','시더우드'],
+    axes:[3,3,4], when:'특별한 날, 소중한 사람을 만날 때, 봄 나들이' },
+  soap:{ no:3, name:'솝 & 머스크', en:'Soap & Musk', color:'#7695AE', soft:'#E2EAF0',
+    tagline:'갓 세탁한 셔츠처럼 깨끗한 단정함', mood:['깨끗한','포근한','단정한','편안한'],
+    family:'비누 거품, 깨끗한 면, 살결 같은 머스크를 표현한 향 계열이에요. 강하게 튀지 않고 <b>피부에 밀착되어 은은하게</b> 남기 때문에 누구에게나 호감을 주는 향으로 꼽힙니다.',
+    persona:'깨끗하고 포근한 향에 끌리는 사람은 <b>단정하고 믿음직한 분위기</b>를 가지고 있어요. 화려하게 드러내기보다 곁에 있으면 편안해지는, 신뢰를 주는 사람이에요.',
+    top:['알데하이드','베르가못'], mid:['코튼 플라워','아이리스'], base:['화이트 머스크','앰브레트'],
+    axes:[2,2,1], when:'매일 학교 갈 때, 깔끔한 첫인상이 필요할 때' },
+  woody:{ no:4, name:'우디', en:'Woody', color:'#76583B', soft:'#ECE3D8',
+    tagline:'숲처럼 차분하고 깊이 있는 존재감', mood:['차분한','깊이 있는','따뜻한','든든한'],
+    family:'편백·시더우드·샌달우드 같은 나무와 흙, 이끼의 향 계열이에요. 분자가 무겁고 천천히 날아가서 <b>향의 바탕(베이스 노트)</b>을 이루며, 시간이 지날수록 따뜻하게 깊어집니다.',
+    persona:'나무 향에 끌리는 사람은 <b>차분하고 생각이 깊은 분위기</b>를 가지고 있어요. 자기만의 세계가 뚜렷하고, 친구들이 고민을 털어놓고 싶어 하는 든든한 사람이에요.',
+    top:['사이프러스','카다멈'], mid:['편백','시더우드'], base:['샌달우드','베티버'],
+    axes:[5,4,2], when:'공부·독서에 집중할 때, 혼자만의 시간, 가을' },
+  fruit:{ no:5, name:'프루트', en:'Fruity', color:'#AE4F45', soft:'#F2E0DC',
+    tagline:'잘 익은 과일처럼 달콤하고 생기 있는 매력', mood:['달콤한','발랄한','사랑스러운','생기 있는'],
+    family:'복숭아·베리·사과 같은 과일 과육을 표현한 향 계열이에요. 시트러스보다 <b>달콤하고 즙이 많은 느낌</b>이 특징이며, 밝고 친근한 인상을 줍니다.',
+    persona:'달콤한 과일 향에 끌리는 사람은 <b>유쾌하고 사랑스러운 분위기</b>를 가지고 있어요. 표현이 솔직하고 풍부해서 어디서든 분위기를 띄우는 사람이에요.',
+    top:['블랙커런트','배'], mid:['복숭아','라즈베리'], base:['바닐라','머스크'],
+    axes:[2,3,5], when:'친구들과 놀러 갈 때, 축제, 기분 전환' }
+};
+const ORDER = ['citrus','floral','soap','woody','fruit'];
+const AXES = [['가벼운','묵직한'],['시원한','따뜻한'],['은은한','화려한']];
+
+/* ===================== 질문 (주 계열 2점, 보조 계열 1점) ===================== */
+const QUESTIONS = [
+  { cat:'Olfactive Memory · 향의 기억', q:'맡으면 기분이 좋아지는 냄새는?', a:[
+    ['귤껍질을 깔 때 확 퍼지는 냄새',{citrus:2,fruit:1}],
+    ['꽃집 앞을 지날 때 나는 냄새',{floral:2,soap:1}],
+    ['갓 세탁해서 말린 옷 냄새',{soap:2,woody:1}],
+    ['비 온 뒤 숲길의 흙과 나무 냄새',{woody:2,citrus:1}],
+    ['잘 익은 복숭아를 자를 때 나는 냄새',{fruit:2,floral:1}] ]},
+  { cat:'Daily Scent · 일상의 향', q:'샴푸나 바디워시를 고른다면 어떤 향?', a:[
+    ['레몬·자몽처럼 상큼한 향',{citrus:2,soap:1}],
+    ['장미·벚꽃처럼 화사한 향',{floral:2,fruit:1}],
+    ['코튼·베이비파우더처럼 보송한 향',{soap:2,floral:1}],
+    ['편백·시더우드처럼 차분한 향',{woody:2,soap:1}],
+    ['피치·베리처럼 달콤한 향',{fruit:2,floral:1}] ]},
+  { cat:'Taste & Aroma · 맛과 향', q:'좋아하는 차나 음료의 향은?', a:[
+    ['유자차·레모네이드',{citrus:2,fruit:1}],
+    ['캐모마일·꽃차',{floral:2,woody:1}],
+    ['부드러운 밀크티·우유',{soap:2,woody:1}],
+    ['구수한 보리차·누룽지',{woody:2,soap:1}],
+    ['복숭아 아이스티',{fruit:2,citrus:1}] ]},
+  { cat:'Local Scent · 봉화의 향', q:'봉화에서 맡아 본 냄새 중 가장 좋은 것은?', a:[
+    ['소나무(춘양목) 숲 냄새',{woody:2,citrus:1}],
+    ['가을 사과밭의 달콤한 냄새',{fruit:2,floral:1}],
+    ['봄에 핀 아카시아꽃 냄새',{floral:2,fruit:1}],
+    ['햇볕과 바람에 마른 빨래 냄새',{soap:2,citrus:1}],
+    ['겨울에 끓인 유자차 냄새',{citrus:2,fruit:1}] ]},
+  { cat:'Character · 향의 성격', q:'내가 끌리는 향의 느낌은?', a:[
+    ['톡 쏘고 시원하게 상쾌한 향',{citrus:2,soap:1}],
+    ['화사하고 우아한 향',{floral:2,fruit:1}],
+    ['은은하고 살결처럼 포근한 향',{soap:2,floral:1}],
+    ['차분하고 깊이 있는 향',{woody:2,soap:1}],
+    ['달콤하고 존재감 있는 향',{fruit:2,floral:1}] ]},
+  { cat:'Dry Down · 잔향', q:'향이 사라질 때 남았으면 하는 잔향은?', a:[
+    ['상쾌함만 살짝 남고 깔끔하게 사라지는 향',{citrus:2,soap:1}],
+    ['은은한 꽃내음이 오래 맴도는 향',{floral:2,soap:1}],
+    ['피부에 스며든 듯 포근하게 남는 향',{soap:2,woody:1}],
+    ['따뜻하고 묵직하게 깔리는 나무 향',{woody:2,fruit:1}],
+    ['달콤함이 오래 남는 향',{fruit:2,woody:1}] ]},
+  { cat:'Ambience · 공간의 향', q:'방에 향초를 하나 켠다면?', a:[
+    ['레몬그라스 · 오렌지',{citrus:2,woody:1}],
+    ['라벤더 · 로즈',{floral:2,soap:1}],
+    ['클린 코튼 · 화이트 머스크',{soap:2,floral:1}],
+    ['샌달우드 · 시더우드',{woody:2,soap:1}],
+    ['애플 · 블랙베리',{fruit:2,citrus:1}] ]},
+  { cat:'Impression · 남기고 싶은 인상', q:'향수를 뿌렸을 때 듣고 싶은 말은?', a:[
+    ['“너한테서 상큼한 향이 나.”',{citrus:2,fruit:1}],
+    ['“꽃향기 같은 좋은 냄새가 나.”',{floral:2,fruit:1}],
+    ['“막 씻고 나온 것처럼 깨끗해.”',{soap:2,citrus:1}],
+    ['“숲에 온 것처럼 편안해져.”',{woody:2,soap:1}],
+    ['“달콤한 냄새 나, 무슨 향수야?”',{fruit:2,floral:1}] ]}
+];
+
+/* ===================== 유틸 ===================== */
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo(0,0); }
+const STORE_KEY='scentStats2026';
+function loadStats(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY))||{}; }catch(e){ return {}; } }
+function saveStats(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){} }
+
+/* ===================== 시작 화면 ===================== */
+$('families').innerHTML = ORDER.map(k=>{ const s=SCENTS[k];
+  return `<div>${icon(k,s.color)}<span class="n">No.${pad(s.no)}</span><span class="k">${s.name.replace(' & ','&')}</span><span class="e en">${s.en}</span></div>`; }).join('');
+$('rail').innerHTML = QUESTIONS.map(()=>'<i></i>').join('');
+
+// 시작 화면 히어로: 향수병 + 둥둥 떠다니는 향 재료 + 반짝이
+(function(){
+  const pos=[[0,40],[232,20],[250,170],[-6,200],[120,292]];
+  $('heroArt').innerHTML = '<div class="glow"></div>' + bottleArt('#F5A3C0',{label:['SCENT','No.?'],mist:true})
+    + ORDER.map((k,i)=>`<div class="ing" style="left:${pos[i][0]}px;top:${pos[i][1]}px;animation-delay:${i*0.6}s">${icon(k,SCENTS[k].color)}</div>`).join('')
+    + [[40,10],[268,110],[20,300],[200,0],[150,250]].map(([x,y],i)=>SPARK.replace('class="sparkle"',`class="sparkle" style="left:${x}px;top:${y}px;animation-delay:${i*0.45}s"`)).join('');
+})();
+
+// 배경에 올라가는 비눗방울
+(function(){
+  const box=$('bubbles');
+  for(let i=0;i<14;i++){
+    const b=document.createElement('b'); const s=10+Math.random()*34;
+    b.style.width=b.style.height=s+'px'; b.style.left=Math.random()*100+'%';
+    b.style.setProperty('--sx',(Math.random()*120-60)+'px');
+    b.style.animationDuration=(14+Math.random()*16)+'s'; b.style.animationDelay=(-Math.random()*28)+'s';
+    box.appendChild(b);
+  }
+})();
+
+let answers=[], qi=0, shuffled=[], locked=false;
+$('startBtn').onclick=()=>{
+  answers=new Array(QUESTIONS.length).fill(null);
+  shuffled=QUESTIONS.map(q=>shuffle(q.a));
+  qi=0; renderQ(); show('quiz');
+};
+
+/* ===================== 질문 ===================== */
+function renderQ(){
+  const Q=QUESTIONS[qi];
+  $('qno').textContent=pad(qi+1); $('qcur').textContent=qi+1;
+  $('qcat').textContent=Q.cat; $('qtext').textContent=Q.q;
+  [...$('rail').children].forEach((r,i)=>r.classList.toggle('on',i<qi || (i===qi && answers[qi])));
+  $('backBtn').disabled=qi===0;
+  const qb=$('qblock'); qb.classList.remove('reveal'); void qb.offsetWidth; qb.classList.add('reveal');
+  const qn=$('qno'); qn.classList.remove('flip'); void qn.offsetWidth; qn.classList.add('flip');
+  const box=$('options'); box.innerHTML='';
+  shuffled[qi].forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'+(answers[qi]===opt?' picked':'');
+    b.style.animationDelay=(0.12+i*0.06)+'s';
+    b.innerHTML=`<span class="l">${'ABCDE'[i]}</span><span>${opt[0]}</span><span class="chk"></span>`;
+    b.onclick=e=>{ ripple(b,e); pick(opt,b); };
+    box.appendChild(b);
+  });
+}
+function ripple(el,e){
+  const r=el.getBoundingClientRect(), size=Math.max(r.width,r.height)*2.2;
+  const x=(e && e.clientX ? e.clientX : r.left+r.width/2)-r.left, y=(e && e.clientY ? e.clientY : r.top+r.height/2)-r.top;
+  const s=document.createElement('span'); s.className='ripple';
+  s.style.cssText=`width:${size}px;height:${size}px;left:${x-size/2}px;top:${y-size/2}px`;
+  el.appendChild(s); setTimeout(()=>s.remove(),650);
+}
+function pick(opt,el){
+  if(locked) return; locked=true;
+  answers[qi]=opt;
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+  el.classList.add('picked');
+  $('rail').children[qi].classList.add('on');
+  setTimeout(()=>{
+    locked=false;
+    if(qi<QUESTIONS.length-1){ qi++; renderQ(); } else analyze();
+  },420);
+}
+$('backBtn').onclick=()=>{ if(qi>0){ qi--; renderQ(); } };
+
+/* ===================== 계산 ===================== */
+function calc(){
+  const score={}, firsts={}; ORDER.forEach(k=>{score[k]=0;firsts[k]=0;});
+  answers.forEach(a=>{ for(const k in a[1]){ score[k]+=a[1][k]; if(a[1][k]===2) firsts[k]++; } });
+  const rank=shuffle(ORDER).sort((x,y)=>(score[y]-score[x])||(firsts[y]-firsts[x]));
+  const sum=ORDER.reduce((p,k)=>p+score[k],0);
+  const pct={}; ORDER.forEach(k=>pct[k]=Math.round(score[k]/sum*100));
+  return {score,rank,sum,pct};
+}
+
+/* ===================== 분석 화면 ===================== */
+function analyze(){
+  const r=calc();
+  $('arows').innerHTML=ORDER.map(k=>`<div class="arow"><span>${SCENTS[k].name}</span>
+    <div class="t"><i style="background:${SCENTS[k].color}"></i></div><span class="v" data-v="${r.pct[k]}">0%</span></div>`).join('');
+  // 점수 비율대로 색이 층층이 쌓인 향수병이 차오름 (낮은 점수가 아래)
+  const layers=r.rank.slice().reverse().map(k=>[SCENTS[k].color,r.pct[k]]);
+  $('abox').innerHTML=bottleArt(layers,{rising:true,level:100}).replace('class="bottle"','class="bottle abottle"');
+  r.rank.slice().reverse().forEach((k,i)=>{
+    const d=document.createElement('div'); d.className='dropin'; d.style.animationDelay=(0.2+i*0.4)+'s';
+    d.innerHTML=icon(k,SCENTS[k].color); $('abox').appendChild(d);
+  });
+  show('analyze');
+  setTimeout(()=>{
+    document.querySelectorAll('#arows .arow').forEach((row,i)=>{
+      const k=ORDER[i]; row.querySelector('i').style.width=(r.pct[k]/Math.max(...ORDER.map(x=>r.pct[x]))*100)+'%';
+      countUp(row.querySelector('.v'), r.pct[k], 1200, '%');
+    });
+  },300);
+  setTimeout(()=>showReport(r),2900);
+}
+function countUp(el,to,dur,suf){
+  const t0=performance.now();
+  (function step(t){ const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(to*e)+(suf||''); if(p<1) requestAnimationFrame(step); })(t0);
+}
+
+/* ===================== 레이더 차트 ===================== */
+function radarSVG(pct, tone){
+  const cx=180, cy=170, R=120, n=5;
+  const max=Math.max(...ORDER.map(k=>pct[k]),1);
+  const pt=(i,r)=>{ const a=-Math.PI/2+i*2*Math.PI/n; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; };
+  let grid='';
+  [0.25,0.5,0.75,1].forEach(f=>{ grid+=`<polygon points="${ORDER.map((_,i)=>pt(i,R*f).join(',')).join(' ')}" fill="none" stroke="#D6CCBE" stroke-width="1"/>`; });
+  ORDER.forEach((_,i)=>{ const [x,y]=pt(i,R); grid+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#D6CCBE"/>`; });
+  const shape=ORDER.map((k,i)=>pt(i,R*Math.max(pct[k]/max,0.06)).join(',')).join(' ');
+  const dots=ORDER.map((k,i)=>{ const [x,y]=pt(i,R*Math.max(pct[k]/max,0.06)); return `<circle cx="${x}" cy="${y}" r="3.5" fill="${SCENTS[k].color}"/>`; }).join('');
+  const labels=ORDER.map((k,i)=>{ const [x,y]=pt(i,R+30); const anchor=Math.abs(x-cx)<5?'middle':(x>cx?'start':'end');
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}">${SCENTS[k].name.replace(' & ','&')}</text><text class="p" x="${x}" y="${y+16}" text-anchor="${anchor}">${pct[k]}%</text>`; }).join('');
+  return `<svg class="radar" id="radar" viewBox="0 0 360 350">${grid}
+    <g class="shape"><polygon points="${shape}" fill="${tone}" fill-opacity=".18" stroke="${tone}" stroke-width="1.6"/>${dots}</g>${labels}</svg>`;
+}
+
+/* ===================== 결과 리포트 ===================== */
+function showReport({rank,pct}){
+  const k=rank[0], s=SCENTS[k], s2=SCENTS[rank[1]];
+  const st=loadStats(); st[k]=(st[k]||0)+1; saveStats(st);
+  const serial=ORDER.reduce((p,x)=>p+(st[x]||0),0) || (Math.floor(Math.random()*900)+100);
+  const date='2026.11.04';  // 2026 봉화 교육 한마당 행사일
+  // 블렌딩 비율: 1·2순위 점수 비율을 10% 단위로 (최소 60:40 ~ 최대 90:10)
+  let a=Math.round(pct[k]/(pct[k]+pct[rank[1]])*10)*10; a=Math.min(90,Math.max(60,a));
+  const el=$('report');
+  el.style.setProperty('--tone',s.color); el.style.setProperty('--soft',s.soft);
+  el.innerHTML=`
+    <div class="rhead reveal">
+      <div><div class="cap">Olfactive Profile Report</div><div class="ttl" style="margin-top:6px">Your Scent Family</div></div>
+      <div class="no">Profile No. ${String(serial).padStart(4,'0')}<br>${date}</div>
+    </div>
+
+    <div class="flip reveal" style="animation-delay:.15s" id="flip">
+     <div class="flip-inner">
+      <div class="cover" id="cover">
+        <div class="pat">${Array.from({length:18},(_,i)=>icon(ORDER[i%5],'#fff')).join('')}</div>
+        <div class="cap" style="position:relative;color:var(--ink-2)">Your scent is…</div>
+        <div class="q">?</div>
+        <div class="t">나의 향 카드가 도착했어요</div>
+        <div class="s">카드를 터치해서 확인하세요</div>
+      </div>
+    <div class="label">
+      <div class="art">${bottleArt(s.color,{label:['No.'+pad(s.no),s.en.split(' ')[0]],mist:true})}</div>
+      <div class="main">
+        <div class="fam">${icon(k,s.color)}<span class="cap" style="color:${s.color}">Family No.${pad(s.no)}</span></div>
+        <div class="big">${s.name}</div>
+        <div class="big-en">${s.en}</div>
+        <div class="tagline">${s.tagline}</div>
+        <div class="kw">${s.mood.map(m=>`<span>${m}</span>`).join('')}</div>
+      </div>
+      <div class="side">
+        <div class="cap">Your Bottle</div>
+        <div class="num">${pad(s.no)}</div>
+        <div class="sub">${s.no}번 ${s.name} 향수<br>이 화면을 부스 스태프에게 보여 주세요</div>
+      </div>
+    </div>
+     </div>
+    </div>
+
+    <div class="rest" id="rest">
+
+    <div class="sec reveal" style="animation-delay:.3s">
+      <div class="sec-h"><span class="i">i.</span><h4>향 계열과 나의 분위기</h4><span class="cap">Family & Mood</span></div>
+      <div class="two">
+        <p class="prose">${s.family}</p>
+        <p class="prose">${s.persona}</p>
+      </div>
+    </div>
+
+    <div class="sec reveal" style="animation-delay:.45s">
+      <div class="two">
+        <div>
+          <div class="sec-h"><span class="i">ii.</span><h4>후각 취향 분포</h4><span class="cap">Preference</span></div>
+          ${radarSVG(pct,s.color)}
+        </div>
+        <div>
+          <div class="sec-h"><span class="i">iii.</span><h4>추천 노트 구성</h4><span class="cap">Note Pyramid</span></div>
+          <div class="pyr">
+            <div class="tier"><div class="nm">Top<small>탑 노트 · 첫인상</small></div><div class="nt">${s.top.join('<span>/</span>')}</div></div>
+            <div class="tier"><div class="nm">Middle<small>미들 노트 · 중심</small></div><div class="nt">${s.mid.join('<span>/</span>')}</div></div>
+            <div class="tier"><div class="nm">Base<small>베이스 · 잔향</small></div><div class="nt">${s.base.join('<span>/</span>')}</div></div>
+          </div>
+          <p class="fine">향수는 시간에 따라 탑 → 미들 → 베이스 노트 순서로 향이 변해요.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec reveal" style="animation-delay:.6s">
+      <div class="two">
+        <div>
+          <div class="sec-h"><span class="i">iv.</span><h4>향의 성격</h4><span class="cap">Character</span></div>
+          ${AXES.map((ax,i)=>`<div class="scale"><div class="ends"><span>${ax[0]}</span><span>${ax[1]}</span></div>
+            <div class="bar">${[25,50,75].map(p=>`<span class="tick" style="left:${p}%"></span>`).join('')}<span class="dot" data-x="${(s.axes[i]-1)*25}"></span></div></div>`).join('')}
+        </div>
+        <div>
+          <div class="sec-h"><span class="i">v.</span><h4>나만의 블렌딩 제안</h4><span class="cap">Layering</span></div>
+          <div class="blendbar">
+            <div data-w="${a}" style="background:${s.color}">${s.name}<span>${a}</span></div>
+            <div data-w="${100-a}" style="background:${s2.color}">${100-a>=30?s2.name:''}<span>${100-a}</span></div>
+          </div>
+          <p class="prose" style="font-size:16px">두 번째로 높은 계열은 <b>${s2.name}</b>${eyo(s2.name)}. ${s.name} 향수에 ${s2.name} 계열을 살짝 겹쳐 뿌리면 나만의 레이어링 향이 됩니다.</p>
+          <p class="fine">추천 사용 시기 — ${s.when}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="end-row reveal" style="animation-delay:.75s">
+      <div class="meta">향수는 손목이나 옷 안쪽에 1~2번 가볍게 뿌려 주세요.<br>2분 동안 입력이 없으면 처음 화면으로 돌아갑니다.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn sci-btn" id="toSciBtn"><span class="flask-ic"></span>향 과학 퀴즈 <small>간식 도전</small></button>
+        <button class="btn line" id="againBtn">처음으로 <span class="arr">↺</span></button>
+      </div>
+    </div>
+    </div>`;
+  show('report');
+  // 카드 터치(또는 3초 뒤 자동)로 뒤집어서 결과 공개
+  let opened=false;
+  const open=()=>{
+    if(opened || !$('report').classList.contains('active')) return; opened=true; clearTimeout(autoT);
+    $('flip').classList.add('open');
+    setTimeout(()=>{ celebrate(k); $('rest').classList.add('show'); },550);
+    setTimeout(()=>{
+      $('radar').classList.add('on');
+      el.querySelectorAll('.scale .dot').forEach(d=>d.style.left=d.dataset.x+'%');
+      el.querySelectorAll('.blendbar div').forEach(b=>b.style.width=b.dataset.w+'%');
+    },1300);
+  };
+  const autoT=setTimeout(open,3000);
+  $('cover').onclick=open;
+  $('againBtn').onclick=reset;
+  $('toSciBtn').onclick=startSci;
+}
+
+/* 결과 공개 축하 효과: 향 재료 아이콘이 터져 나오고 꽃잎이 흩날림 */
+function celebrate(k){
+  const r=$('flip').getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+Math.min(r.height,400)/2;
+  for(let i=0;i<16;i++){
+    const b=document.createElement('div'); b.className='burst';
+    const ang=Math.PI*2*i/16+Math.random()*.3, dist=140+Math.random()*120;
+    b.style.left=cx+'px'; b.style.top=cy+'px';
+    b.style.setProperty('--bx',Math.cos(ang)*dist+'px'); b.style.setProperty('--by',Math.sin(ang)*dist+'px');
+    b.style.setProperty('--br',(Math.random()*360-180)+'deg');
+    b.innerHTML = i%3===0 ? SPARK.replace('class="sparkle"','') : icon(k,SCENTS[k].color);
+    document.body.appendChild(b); setTimeout(()=>b.remove(),1500);
+  }
+  const cols=[SCENTS[k].color,'#F9C9DA','#E3D6FF','#CDEFE3','#FFE6A8'];
+  for(let i=0;i<46;i++){
+    const p=document.createElement('i'); p.className='petal';
+    p.style.left=Math.random()*100+'vw'; p.style.background=cols[i%cols.length];
+    p.style.setProperty('--px',(Math.random()*160-80)+'px'); p.style.setProperty('--pr',(Math.random()*720)+'deg');
+    p.style.animationDuration=(2.8+Math.random()*2.4)+'s'; p.style.animationDelay=(Math.random()*.8)+'s';
+    document.body.appendChild(p); setTimeout(()=>p.remove(),6500);
+  }
+}
+/* ===================== 향 과학 퀴즈 =====================
+   문제 은행에서 5문제 무작위 출제, 3개 이상 맞히면 간식
+   형식: { q:문제, a:[보기...], c:정답 인덱스, e:해설 } */
+const SCI_BANK = [
+  { q:'향수를 뿌리면 냄새가 방 전체로 퍼져요. 이처럼 입자가 스스로 움직여 퍼져 나가는 현상은?',
+    a:['확산','응결','승화','융해'], c:0,
+    e:'<b>확산</b>은 입자가 스스로 끊임없이 움직여서 농도가 높은 곳에서 낮은 곳으로 퍼져 나가는 현상이에요. 향수 냄새가 멀리까지 퍼지는 것도 확산 덕분이에요.' },
+  { q:'향수 냄새가 더 빨리 퍼지는 때는 언제일까요?',
+    a:['추운 겨울 교실','따뜻한 여름 교실','두 곳이 똑같다'], c:1,
+    e:'온도가 높을수록 입자의 운동이 활발해져서 <b>확산이 더 빨리</b> 일어나요. 그래서 향수는 체온이 높은 손목·목 뒤에 뿌리면 향이 잘 퍼져요.' },
+  { q:'확산은 공기 같은 기체에서만 일어난다.',
+    a:['O','X'], c:1,
+    e:'물에 잉크를 한 방울 떨어뜨리면 천천히 퍼지는 것처럼 <b>액체에서도 확산</b>이 일어나요. 다만 기체보다 입자 사이 간격이 좁아 더 느리게 퍼져요.' },
+  { q:'공기가 전혀 없는 진공 속에서는 확산이 어떻게 될까요?',
+    a:['더 빨라진다','더 느려진다','일어나지 않는다'], c:0,
+    e:'진공에는 향 입자의 움직임을 방해하는 공기 입자가 없어서 <b>확산이 더 빨리</b> 일어나요.' },
+  { q:'향수를 손목에 뿌리면 금방 말라요. 향수 속 알코올이 액체에서 기체로 변하는 이 현상은?',
+    a:['응결','증발','응고','액화'], c:1,
+    e:'액체 표면에서 기체로 변하는 현상을 <b>증발</b>이라고 해요. 향수의 알코올(에탄올)이 증발하면서 향 입자를 공기 중으로 실어 날라요.' },
+  { q:'향수의 탑·미들·베이스 노트 중 뿌리자마자 가장 먼저 느껴지고 가장 빨리 날아가는 것은?',
+    a:['탑 노트','미들 노트','베이스 노트'], c:0,
+    e:'<b>탑 노트</b>는 시트러스처럼 가볍고 잘 날아가는 향료로 만들어져 처음 15분 정도 느껴져요. 무거운 우디·머스크 향은 베이스 노트로 오래 남아요.' },
+  { q:'가벼운 향 분자와 무거운 향 분자 중 더 빨리 확산하는 것은?',
+    a:['가벼운 분자','무거운 분자','똑같다'], c:0,
+    e:'같은 온도에서는 <b>질량이 작은(가벼운) 분자</b>가 더 빠르게 움직여서 더 빨리 퍼져요. 그래서 가벼운 시트러스 향이 먼저 느껴져요.' },
+  { q:'같은 냄새를 오래 맡고 있으면 그 냄새를 점점 잘 못 느끼게 된다.',
+    a:['O','X'], c:0,
+    e:'후각은 쉽게 피로해져서 같은 냄새에 금방 익숙해져요(<b>후각 순응</b>). 그래서 시향할 때는 중간중간 팔 안쪽 냄새를 맡거나 쉬면서 코를 리셋해요.' },
+  { q:'우리가 냄새를 느끼는 후각 세포는 어디에 있을까요?',
+    a:['콧구멍 입구의 털','코 안쪽 윗부분','혀 뒤쪽','귀 안쪽'], c:1,
+    e:'냄새 입자는 <b>코 안쪽 윗부분의 후각 상피</b>에 있는 후각 세포에 닿아 신호를 만들고, 이 신호가 뇌로 전달되어 냄새를 느껴요.' },
+  { q:'레몬·오렌지 같은 시트러스 향의 향료(에센셜 오일)는 주로 과일의 어느 부분에서 얻을까요?',
+    a:['씨앗','과육(즙)','껍질','잎'], c:2,
+    e:'시트러스 향료는 주로 <b>과일 껍질</b>을 눌러 짜서 얻어요. 귤껍질을 깔 때 손에 향이 배는 것도 껍질 속 향기 성분 때문이에요.' },
+  { q:'향수에서 향료를 녹이는 데 가장 많이 쓰이는 액체는?',
+    a:['식용유','에탄올(알코올)','소금물','우유'], c:1,
+    e:'향수는 주로 <b>에탄올</b>에 향료를 녹여 만들어요. 에탄올은 향료를 잘 녹이고 빨리 증발해서 향을 공기 중으로 잘 퍼뜨려요.' },
+  { q:'바람이 전혀 없는 방에서도 향수 냄새가 퍼지는 이유는?',
+    a:['향 입자가 스스로 끊임없이 움직이기 때문','향 입자의 크기가 커지기 때문','향 입자가 사라지기 때문'], c:0,
+    e:'모든 물질의 입자는 <b>스스로 끊임없이 움직여요(입자의 운동)</b>. 그래서 바람이 없어도 향 입자가 공기 입자 사이로 퍼져 나가요.' }
+];
+const SCI_N=5, SCI_PASS=3;
+let sciQs=[], si=0, sciScore=0, sciLocked=false;
+
+function startSci(){
+  sciQs=shuffle(SCI_BANK).slice(0,SCI_N).map(q=>{
+    // O/X 문제는 보기 순서 유지, 나머지는 섞기
+    const idx=q.a.map((_,i)=>i); const order=(q.a[0]==='O') ? idx : shuffle(idx);
+    return { q:q.q, a:order.map(i=>q.a[i]), c:order.indexOf(q.c), e:q.e };
+  });
+  si=0; sciScore=0;
+  const st=loadStats(); st.sciTry=(st.sciTry||0)+1; saveStats(st);
+  renderSci(); show('sci');
+}
+function renderSci(){
+  const Q=sciQs[si];
+  $('sno').textContent=pad(si+1); $('scur').textContent=si+1; $('stext').textContent=Q.q;
+  $('sdots').innerHTML=sciQs.map((q,i)=>`<i class="${q.res||''}${i===si?' cur':''}"></i>`).join('');
+  const sb=$('sblock'); sb.classList.remove('reveal'); void sb.offsetWidth; sb.classList.add('reveal');
+  const qn=$('sno'); qn.classList.remove('flip'); void qn.offsetWidth; qn.classList.add('flip');
+  $('explain').className='explain'; $('explain').innerHTML='';
+  const box=$('soptions'); box.innerHTML=''; box.classList.toggle('ox', Q.a[0]==='O');
+  Q.a.forEach((txt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.style.animationDelay=(0.12+i*0.06)+'s';
+    b.innerHTML=`<span class="l">${'ABCD'[i]}</span><span>${txt}</span><span class="chk"></span>`;
+    b.onclick=e=>{ ripple(b,e); answerSci(i,b); };
+    box.appendChild(b);
+  });
+  sciLocked=false;
+}
+function answerSci(i,el){
+  if(sciLocked) return; sciLocked=true;
+  const Q=sciQs[si], ok = i===Q.c;
+  if(ok) sciScore++;
+  Q.res = ok ? 'ok' : 'no';
+  const opts=[...$('soptions').children];
+  opts.forEach((o,j)=>{ o.disabled=true; if(j===Q.c) o.classList.add('correct'); });
+  if(!ok) el.classList.add('wrong');
+  $('sdots').children[si].className=Q.res+' cur';
+  const last = si===sciQs.length-1;
+  $('explain').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'정답이에요!':'아쉬워요, 정답은 '+(Q.a[0]==='O' ? Q.a[Q.c] : 'ABCD'[Q.c]+'번')+'!'}</div>
+    <p>${Q.e}</p><button class="btn" id="sciNext">${last?'결과 보기':'다음 문제'} <span class="arr">→</span></button>`;
+  $('explain').className='explain show';
+  setTimeout(()=>$('explain').scrollIntoView({behavior:'smooth',block:'nearest'}),120);
+  $('sciNext').onclick=()=>{ if(last) sciResult(); else { si++; renderSci(); window.scrollTo(0,0); } };
+}
+function snackSVG(){
+  return `<svg class="snack" viewBox="0 0 240 170" aria-hidden="true">
+    <g class="sn1"><circle cx="78" cy="96" r="52" fill="#E9B97A"/><circle cx="78" cy="96" r="52" fill="none" stroke="#D49A55" stroke-width="4"/>
+      <circle cx="60" cy="78" r="7" fill="#6B4630"/><circle cx="92" cy="72" r="6" fill="#6B4630"/><circle cx="98" cy="108" r="7" fill="#6B4630"/>
+      <circle cx="62" cy="114" r="6" fill="#6B4630"/><circle cx="80" cy="94" r="5" fill="#6B4630"/></g>
+    <g class="sn2"><path d="M140 70 L118 52 L120 92 Z" fill="#F7A8C4"/><path d="M212 70 L234 52 L232 92 Z" fill="#F7A8C4"/>
+      <circle cx="176" cy="72" r="38" fill="#FFD3E2"/><path d="M150 50 Q176 72 150 96 M168 36 Q194 72 168 108 M190 38 Q214 72 192 106" stroke="#EE8FB2" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <circle cx="166" cy="58" r="8" fill="#fff" opacity=".7"/></g>
+    <g class="sn3"><rect x="150" y="118" width="62" height="40" rx="10" fill="#CDEFE3"/><rect x="150" y="118" width="62" height="12" rx="6" fill="#9ED9C3"/>
+      <text x="181" y="150" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#3B3346">SNACK</text></g>
+  </svg>`;
+}
+function sciResult(){
+  const pass = sciScore>=SCI_PASS;
+  if(pass){ const st=loadStats(); st.sciPass=(st.sciPass||0)+1; saveStats(st); }
+  const el=$('sciResult');
+  el.innerHTML=`
+    <div class="rhead reveal"><div><div class="cap">Science Quiz Result</div><div class="ttl" style="margin-top:6px">향의 과학 퀴즈</div></div>
+      <div class="no">2026.11.04</div></div>
+    <div class="sci-card reveal ${pass?'pass':'fail'}" style="animation-delay:.15s">
+      ${pass ? snackSVG() : '<div class="retry-ic">'+icon('soap','#9A8FA6')+'</div>'}
+      <div class="score"><b class="en" id="scoreNum">0</b><span class="en"> / ${SCI_N}</span></div>
+      <div class="sdots big">${sciQs.map(q=>`<i class="${q.res}"></i>`).join('')}</div>
+      <div class="msg">${pass ? '축하해요! 간식을 받아 가세요' : `아쉬워요! ${SCI_PASS}개 이상 맞히면 간식을 받을 수 있어요`}</div>
+      <div class="sub">${pass ? '이 화면을 부스 스태프에게 보여 주세요' : '문제가 새로 바뀌니까 다시 도전해 보세요'}</div>
+    </div>
+    <div class="end-row reveal" style="animation-delay:.3s">
+      <div class="meta">향이 퍼지는 원리는 <b>확산</b>과 <b>증발</b>,<br>향을 느끼는 건 코 속 <b>후각 세포</b>예요.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${pass ? '' : '<button class="btn" id="sciRetry">다시 도전 <span class="arr">↻</span></button>'}
+        <button class="btn line" id="sciHome2">처음으로 <span class="arr">↺</span></button>
+      </div>
+    </div>`;
+  show('sciResult');
+  countUp($('scoreNum'), sciScore, 900, '');
+  if(pass) setTimeout(()=>celebrateAt(el.querySelector('.sci-card'), ['#E9B97A','#F7A8C4','#CDEFE3','#FFE6A8','#E3D6FF']), 500);
+  if($('sciRetry')) $('sciRetry').onclick=startSci;
+  $('sciHome2').onclick=reset;
+}
+function celebrateAt(target, cols){
+  const r=target.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+Math.min(r.height,360)/2;
+  for(let i=0;i<14;i++){
+    const b=document.createElement('div'); b.className='burst';
+    const ang=Math.PI*2*i/14, dist=130+Math.random()*110;
+    b.style.left=cx+'px'; b.style.top=cy+'px';
+    b.style.setProperty('--bx',Math.cos(ang)*dist+'px'); b.style.setProperty('--by',Math.sin(ang)*dist+'px');
+    b.style.setProperty('--br',(Math.random()*360-180)+'deg');
+    b.innerHTML=SPARK.replace('class="sparkle"','');
+    document.body.appendChild(b); setTimeout(()=>b.remove(),1500);
+  }
+  for(let i=0;i<46;i++){
+    const p=document.createElement('i'); p.className='petal';
+    p.style.left=Math.random()*100+'vw'; p.style.background=cols[i%cols.length];
+    p.style.setProperty('--px',(Math.random()*160-80)+'px'); p.style.setProperty('--pr',(Math.random()*720)+'deg');
+    p.style.animationDuration=(2.8+Math.random()*2.4)+'s'; p.style.animationDelay=(Math.random()*.8)+'s';
+    document.body.appendChild(p); setTimeout(()=>p.remove(),6500);
+  }
+}
+$('sciStartBtn').onclick=startSci;
+$('sciHome').onclick=reset;
+
+function eyo(w){ const c=w.charCodeAt(w.length-1)-0xAC00; return (c>=0 && c<=11171 && c%28) ? "이에요" : "예요"; }
+function reset(){ answers=[]; qi=0; show('intro'); }
+
+/* ===================== 자동 초기화 ===================== */
+let idleTimer;
+function bumpIdle(){ clearTimeout(idleTimer); idleTimer=setTimeout(()=>{ if(!$('intro').classList.contains('active')) reset(); },120000); }
+['pointerdown','keydown','scroll','touchstart'].forEach(ev=>window.addEventListener(ev,bumpIdle,{passive:true}));
+bumpIdle();
+
+/* ===================== 운영자 통계 (좌상단 로고 5번 연속 터치) ===================== */
+let taps=0, tapTimer;
+$('secret').addEventListener('click',()=>{ taps++; clearTimeout(tapTimer); tapTimer=setTimeout(()=>taps=0,1500); if(taps>=5){ taps=0; openStats(); } });
+function openStats(){
+  const st=loadStats(); let total=0;
+  $('statRows').innerHTML=ORDER.map(k=>{ const n=st[k]||0; total+=n;
+    return `<div class="row"><span>No.${pad(SCENTS[k].no)} ${SCENTS[k].name}</span><b>${n}</b></div>`; }).join('')
+    +`<div class="row"><span>향 찾기 합계</span><b>${total}</b></div>`
+    +`<div class="row"><span>과학 퀴즈 도전</span><b>${st.sciTry||0}</b></div>`
+    +`<div class="row"><span>간식 지급 (3개 이상)</span><b>${st.sciPass||0}</b></div>`;
+  $('stats').classList.add('show');
+}
+$('statClose').onclick=()=>$('stats').classList.remove('show');
+// 확인창(confirm)이 막히는 환경이 있어서 두 번 눌러 초기화
+let resetArm=false, resetT;
+$('statReset').onclick=()=>{
+  const b=$('statReset');
+  if(!resetArm){ resetArm=true; b.textContent='한 번 더 누르면 초기화'; clearTimeout(resetT); resetT=setTimeout(()=>{ resetArm=false; b.textContent='초기화'; },3000); return; }
+  resetArm=false; b.textContent='초기화'; saveStats({}); openStats();
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>퍼스널 향찾기 키즈</title>
+<style>
+  :root{
+    --bg:#FFF8EE; --ink:#4A3B52; --sub:#8D7F95; --line:#F1E3D3;
+    --pink:#FF8FB8; --purple:#B48CFF;
+    --citrus:#FFB627; --floral:#FF7EB6; --soap:#5DB8F5; --woody:#B07D4F; --fruit:#FF6157;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:"Malgun Gothic","맑은 고딕",sans-serif;
+    background:linear-gradient(180deg,#FFF3F8 0%,#FFF8EE 45%,#EEF7FF 100%);
+    color:var(--ink); overflow-x:hidden; -webkit-user-select:none; user-select:none;
+  }
+  /* 둥둥 떠다니는 배경 */
+  #floaties{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  #floaties span{position:absolute;bottom:-60px;font-size:28px;opacity:.55;animation:rise linear infinite}
+  @keyframes rise{
+    0%{transform:translate(0,0) rotate(0)}
+    25%{transform:translate(20px,-25vh) rotate(20deg)}
+    50%{transform:translate(-15px,-50vh) rotate(-15deg)}
+    75%{transform:translate(18px,-75vh) rotate(10deg)}
+    100%{transform:translate(0,-110vh) rotate(0)}
+  }
+  .wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;min-height:100%;padding:20px 16px 40px;display:flex;flex-direction:column}
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex;animation:popIn .55s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes popIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:none}}
+
+  /* ---------- 마스코트 (얼굴 있는 향수병) ---------- */
+  .mascot{display:block}
+  .mascot .blink{animation:blink 4s infinite;transform-origin:center 52px}
+  @keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+  .mascot .cheek{animation:cheek 2s ease-in-out infinite}
+  @keyframes cheek{50%{opacity:.4}}
+  .bounce{animation:bounce 1.6s ease-in-out infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-14px) rotate(3deg)}}
+
+  /* ---------- 시작 ---------- */
+  .intro{justify-content:center;align-items:center;text-align:center;gap:16px}
+  .badge{font-size:15px;font-weight:800;color:#fff;background:var(--purple);padding:8px 18px;border-radius:999px;box-shadow:0 4px 0 #8E66E0;cursor:pointer}
+  .intro h1{font-size:clamp(46px,11vw,78px);font-weight:900;line-height:1.1;letter-spacing:-.02em}
+  .intro h1 .w{display:inline-block;animation:wave 1.8s ease-in-out infinite}
+  @keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .intro .lead{font-size:clamp(19px,4.2vw,23px);line-height:1.6;font-weight:700;color:var(--sub)}
+  .speech{position:relative;background:#fff;border-radius:22px;padding:12px 20px;font-size:19px;font-weight:800;box-shadow:0 6px 0 var(--line);animation:wiggle 2.5s ease-in-out infinite}
+  .speech::after{content:"";position:absolute;left:50%;bottom:-12px;margin-left:-10px;border:10px solid transparent;border-top-color:#fff;border-bottom:0}
+  @keyframes wiggle{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+  .friends{display:flex;gap:8px;justify-content:center}
+  .friends span{font-size:38px;display:inline-block;animation:hop 1.2s ease-in-out infinite}
+  .friends span:nth-child(2){animation-delay:.15s}.friends span:nth-child(3){animation-delay:.3s}
+  .friends span:nth-child(4){animation-delay:.45s}.friends span:nth-child(5){animation-delay:.6s}
+  @keyframes hop{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-16px) scale(1.1)}60%{transform:translateY(0) scale(1.05,.9)}}
+  .btn{
+    font:inherit;font-size:26px;font-weight:900;border:none;border-radius:999px;cursor:pointer;color:#fff;
+    padding:18px 52px;background:linear-gradient(180deg,#FF9EC4,#FF6FA5);box-shadow:0 7px 0 #E0508A;
+    transition:transform .1s, box-shadow .1s; animation:pulse 1.8s ease-in-out infinite
+  }
+  .btn:active{transform:translateY(6px);box-shadow:0 1px 0 #E0508A;animation:none}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .org{font-size:14px;color:var(--sub);font-weight:700}
+
+  /* ---------- 질문 ---------- */
+  .topbar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .back{font:inherit;font-size:16px;font-weight:800;background:#fff;border:none;border-radius:14px;color:var(--sub);cursor:pointer;padding:8px 12px;box-shadow:0 3px 0 var(--line)}
+  .back:disabled{visibility:hidden}
+  .sound{font-size:22px;background:#fff;border:none;border-radius:14px;padding:6px 10px;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+  .track{position:relative;flex:1;height:18px;background:#fff;border-radius:999px;box-shadow:inset 0 2px 0 var(--line)}
+  .track .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:999px;
+    background:repeating-linear-gradient(45deg,#FFB3D0 0 12px,#FF8FB8 12px 24px);background-size:34px 34px;
+    animation:stripes 1s linear infinite;transition:width .5s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes stripes{to{background-position:34px 0}}
+  .track .runner{position:absolute;top:-22px;left:0;font-size:32px;transform:translateX(-50%);transition:left .5s cubic-bezier(.34,1.56,.64,1)}
+  .track .runner i{display:inline-block;font-style:normal;animation:bounce .6s ease-in-out infinite}
+  .track .goal{position:absolute;right:-6px;top:-14px;font-size:26px}
+  .qhead{display:flex;align-items:center;gap:12px;margin:18px 0 18px}
+  .qhead .mini{flex:0 0 auto;width:70px}
+  .bubble{flex:1;background:#fff;border-radius:24px;padding:16px 18px;box-shadow:0 6px 0 var(--line);position:relative}
+  .bubble::before{content:"";position:absolute;left:-14px;top:24px;border:10px solid transparent;border-right-color:#fff;border-left:0}
+  .qnum{font-size:15px;font-weight:900;color:var(--pink);margin-bottom:4px}
+  .qtext{font-size:clamp(23px,5.4vw,31px);font-weight:900;line-height:1.35;word-break:keep-all}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .opt{
+    font:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+    background:#fff;border:none;border-radius:24px;padding:16px 10px 14px;cursor:pointer;min-height:140px;
+    font-size:clamp(17px,3.8vw,20px);font-weight:800;color:var(--ink);line-height:1.35;word-break:keep-all;
+    box-shadow:0 6px 0 var(--c,var(--line));position:relative;
+    animation:cardIn .5s cubic-bezier(.34,1.56,.64,1) both
+  }
+  .opt:last-child:nth-child(odd){grid-column:1 / -1}
+  @keyframes cardIn{from{opacity:0;transform:scale(.4) rotate(-8deg)}to{opacity:1;transform:none}}
+  .opt .em{font-size:52px;line-height:1;display:inline-block;animation:float 2.4s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+  .opt:active{transform:translateY(5px);box-shadow:0 1px 0 var(--c,var(--line))}
+  .opt.picked{animation:jelly .5s ease both;background:#FFF0F6;outline:4px solid var(--pink)}
+  @keyframes jelly{0%{transform:scale(1)}30%{transform:scale(1.15,.85)}50%{transform:scale(.9,1.1)}70%{transform:scale(1.05,.95)}100%{transform:scale(1)}}
+
+  /* 터치할 때 반짝이 */
+  .spark{position:fixed;pointer-events:none;z-index:50;font-size:22px;animation:spark .8s ease-out forwards}
+  @keyframes spark{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.2) rotate(180deg)}}
+
+  /* ---------- 블렌딩 ---------- */
+  .blend{justify-content:center;align-items:center;text-align:center;gap:18px}
+  .blend h2{font-size:clamp(26px,6vw,34px);font-weight:900}
+  .blend p{font-size:19px;font-weight:700;color:var(--sub)}
+  .flask{position:relative;width:180px;height:230px;animation:shake .35s ease-in-out infinite}
+  @keyframes shake{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+  .flask .glass{position:absolute;left:20px;right:20px;top:46px;bottom:0;border:6px solid #fff;border-radius:40px 40px 50px 50px;overflow:hidden;background:rgba(255,255,255,.5);box-shadow:0 8px 0 var(--line)}
+  .flask .neck{position:absolute;left:62px;right:62px;top:14px;height:38px;background:rgba(255,255,255,.7);border:6px solid #fff;border-bottom:none;border-radius:10px 10px 0 0}
+  .flask .cap{position:absolute;left:56px;right:56px;top:0;height:20px;background:var(--purple);border-radius:8px}
+  .flask .layer{position:absolute;left:0;right:0;bottom:0;height:0;transition:height .45s ease}
+  .flask .bub{position:absolute;bottom:0;width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.8);animation:bub 1.4s ease-in infinite}
+  @keyframes bub{from{transform:translateY(0);opacity:1}to{transform:translateY(-150px);opacity:0}}
+  .drop{position:absolute;top:-40px;left:50%;width:24px;height:24px;margin-left:-12px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);opacity:0}
+  .drop.go{animation:dropFall .5s ease-in forwards}
+  @keyframes dropFall{from{opacity:1;top:-60px}to{opacity:1;top:60px}}
+  .magic{font-size:30px;letter-spacing:8px}
+  .magic span{display:inline-block;animation:twinkle 1s ease-in-out infinite}
+  .magic span:nth-child(2){animation-delay:.2s}.magic span:nth-child(3){animation-delay:.4s}
+  @keyframes twinkle{0%,100%{transform:scale(.6);opacity:.4}50%{transform:scale(1.2);opacity:1}}
+
+  /* ---------- 결과 ---------- */
+  .result{gap:16px;align-items:stretch}
+  .hero{
+    position:relative;border-radius:34px;padding:22px 20px 24px;text-align:center;overflow:hidden;
+    background:var(--soft);box-shadow:0 8px 0 var(--tone)
+  }
+  .hero .rays{position:absolute;left:50%;top:150px;width:700px;height:700px;margin:-350px 0 0 -350px;
+    background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.55) 0 10deg,transparent 10deg 20deg);
+    animation:spin 18s linear infinite;border-radius:50%}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .hero > *:not(.rays){position:relative}
+  .hero .who{font-size:19px;font-weight:800;color:var(--sub)}
+  .hero .fairy{font-size:110px;line-height:1.1;display:inline-block;margin:6px 0;animation:fairyIn 1s cubic-bezier(.34,1.56,.64,1) both, bounce 1.8s 1s ease-in-out infinite}
+  @keyframes fairyIn{from{transform:scale(0) rotate(-540deg)}to{transform:scale(1) rotate(0)}}
+  .hero .scent{font-size:clamp(40px,10vw,60px);font-weight:900;color:var(--tone);line-height:1.15;
+    text-shadow:3px 3px 0 #fff, -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff;animation:popIn .6s .4s both cubic-bezier(.34,1.56,.64,1)}
+  .hero .title{font-size:clamp(21px,5vw,27px);font-weight:900;margin-top:6px;word-break:keep-all;animation:popIn .6s .6s both}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+  .tags span{background:#fff;color:var(--tone);font-weight:900;font-size:17px;padding:7px 14px;border-radius:999px;animation:cardIn .5s both cubic-bezier(.34,1.56,.64,1)}
+  .pickup{display:flex;align-items:center;gap:14px;background:#fff;border-radius:26px;padding:16px 18px;box-shadow:0 6px 0 var(--tone);animation:popIn .6s .9s both}
+  .pickup .no{flex:0 0 auto;width:72px;height:72px;border-radius:50%;background:var(--tone);color:#fff;display:grid;place-items:center;font-size:36px;font-weight:900;animation:wiggle 1s ease-in-out infinite}
+  .pickup b{font-size:21px;display:block;font-weight:900;word-break:keep-all}
+  .pickup small{font-size:15px;color:var(--sub);font-weight:700}
+  .card{background:#fff;border-radius:26px;padding:20px;box-shadow:0 6px 0 var(--line);animation:popIn .6s both}
+  .card h3{font-size:19px;font-weight:900;margin-bottom:10px}
+  .card p{font-size:19px;line-height:1.7;font-weight:700;word-break:keep-all}
+  .notes{display:flex;flex-wrap:wrap;gap:8px}
+  .notes span{background:var(--soft);font-size:18px;font-weight:800;padding:8px 14px;border-radius:14px}
+  .bars{display:grid;gap:12px}
+  .bar{display:grid;grid-template-columns:44px 1fr 52px;align-items:center;gap:8px;font-size:17px;font-weight:800}
+  .bar .n{font-size:30px;text-align:center}
+  .bar .t{height:22px;background:#F6EEE6;border-radius:999px;overflow:hidden}
+  .bar .t i{display:block;height:100%;width:0;border-radius:999px;transition:width 1.2s cubic-bezier(.34,1.56,.64,1)}
+  .bar .v{text-align:right;color:var(--sub)}
+  .actions{display:flex;justify-content:center;margin-top:8px}
+  .idle{font-size:13px;color:var(--sub);text-align:center;font-weight:700}
+  .confetti{position:fixed;top:-20px;width:12px;height:16px;z-index:40;pointer-events:none;border-radius:3px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot));}}
+
+  /* ---------- 운영자 통계 ---------- */
+  .modal{position:fixed;inset:0;background:rgba(74,59,82,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+  .modal.show{display:flex}
+  .modal .box{background:#fff;border-radius:24px;padding:24px;width:min(420px,100%)}
+  .modal h3{font-size:20px;margin-bottom:6px}
+  .modal .hint{font-size:14px;color:var(--sub);margin-bottom:14px}
+  .modal .row{display:flex;justify-content:space-between;font-size:18px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .modal .btns{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+  .modal .btns button{font:inherit;font-size:16px;padding:10px 18px;border-radius:12px;border:1.5px solid var(--line);background:#fff;cursor:pointer}
+  .modal .btns .close{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  @media (max-width:380px){ .opt{min-height:120px} .opt .em{font-size:44px} }
+
+  /* ---------- 과학 퀴즈 ---------- */
+  .btn.sci{background:linear-gradient(180deg,#8FD3FF,#5DB8F5);box-shadow:0 7px 0 #3A93D1;font-size:22px;padding:15px 34px;animation:none}
+  .btn.sci:active{box-shadow:0 1px 0 #3A93D1}
+  .btn.sci small{font-size:14px;background:rgba(255,255,255,.3);padding:3px 10px;border-radius:999px;margin-left:4px}
+  .actions{gap:12px;flex-wrap:wrap}
+  .stars{flex:1;display:flex;justify-content:center;gap:8px;font-size:24px;font-weight:900;color:#D9C9E6}
+  .stars span{display:inline-block;transition:transform .3s}
+  .stars span.cur{transform:scale(1.3)}
+  .stars span.ok,.stars span.no{animation:jelly .5s ease}
+  .options.ox .opt{min-height:170px}
+  .options.ox .opt .em{font-size:84px}
+  .opt:disabled{cursor:default}
+  .opt.right{background:#E3F8EE;outline:4px solid #5CC99A;animation:jelly .5s ease both}
+  .opt.wrong{background:#FFE6E6;outline:4px solid #FF8F8F;animation:shakeX .45s ease both !important}
+  @keyframes shakeX{0%,100%{transform:none}20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+  .explain{max-height:0;overflow:hidden;opacity:0;transition:max-height .6s ease, opacity .4s ease}
+  .explain.show{max-height:700px;opacity:1;margin-top:18px;text-align:center}
+  .explain .verdict{display:inline-block;font-size:24px;font-weight:900;padding:10px 22px;border-radius:999px;margin-bottom:12px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
+  .explain .verdict.ok{background:#DDF6EA;color:#1F8A5C}
+  .explain .verdict.no{background:#FFE3E3;color:#C94444}
+  .explain p{background:#fff;border-radius:22px;padding:16px 18px;font-size:19px;font-weight:700;line-height:1.7;box-shadow:0 6px 0 var(--line);margin-bottom:18px;word-break:keep-all;text-align:left}
+  .explain p b{color:var(--pink)}
+  .score-stars{font-size:36px;letter-spacing:2px;margin:8px 0;white-space:nowrap}
+  .score-stars span{display:inline-block;animation:fairyIn .7s cubic-bezier(.34,1.56,.64,1) both}
+  .snacks{font-size:68px;margin:6px 0}
+  .snacks span{display:inline-block;animation:hop 1.2s ease-in-out infinite}
+  .snacks span:nth-child(2){animation-delay:.2s}.snacks span:nth-child(3){animation-delay:.4s}
+  .snacks.sad span{animation:wiggle 2s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div id="floaties"></div>
+<div class="wrap">
+
+  <!-- 시작 -->
+  <section class="screen intro active" id="intro">
+    <span class="badge" id="secret">2026 봉화 교육 한마당</span>
+    <div class="speech">안녕! 나는 향기 요정 <b style="color:var(--pink)">뿌뿌</b>야~</div>
+    <div class="bounce" id="introMascot" style="width:150px"></div>
+    <h1 id="title"></h1>
+    <p class="lead">질문 7개에 답하면<br>나랑 꼭 닮은 <b style="color:var(--pink)">향기 요정</b>을 찾아 줄게!</p>
+    <div class="friends"><span>🍋</span><span>🌸</span><span>🫧</span><span>🌲</span><span>🍑</span></div>
+    <button class="btn" id="startBtn">시작하기 ✨</button>
+    <button class="btn sci" id="sciStartBtn">🧪 과학 퀴즈 <small>간식 도전!</small></button>
+    <p class="org">춘양중학교 향기 연구 동아리 · 센트 사이언스</p>
+  </section>
+
+  <!-- 질문 -->
+  <section class="screen" id="quiz">
+    <div class="topbar">
+      <button class="back" id="backBtn">◀ 이전</button>
+      <div class="track"><div class="fill" id="fill"></div><div class="runner" id="runner"><i>🐣</i></div><div class="goal">🎁</div></div>
+      <button class="sound" id="soundBtn" aria-label="소리 켜기/끄기">🔊</button>
+    </div>
+    <div class="qhead">
+      <div class="mini bounce" id="qMascot"></div>
+      <div class="bubble"><div class="qnum" id="qnum"></div><h2 class="qtext" id="qtext"></h2></div>
+    </div>
+    <div class="options" id="options"></div>
+  </section>
+
+  <!-- 블렌딩 -->
+  <section class="screen blend" id="blend">
+    <div class="magic"><span>✨</span><span>🌟</span><span>✨</span></div>
+    <div class="flask" id="flask">
+      <div class="cap"></div><div class="neck"></div>
+      <div class="glass" id="glass"></div>
+    </div>
+    <h2>뿌뿌가 향을 섞고 있어요!</h2>
+    <p>살랑살랑~ 섞어 섞어~ 🎶</p>
+  </section>
+
+  <!-- 과학 퀴즈 -->
+  <section class="screen" id="sci">
+    <div class="topbar">
+      <button class="back" id="sciHome">◀ 처음</button>
+      <div class="stars" id="stars"></div>
+      <button class="sound" id="soundBtn2" aria-label="소리 켜기/끄기">🔊</button>
+    </div>
+    <div class="qhead">
+      <div class="mini bounce" id="sMascot"></div>
+      <div class="bubble"><div class="qnum" id="snum"></div><h2 class="qtext" id="stext"></h2></div>
+    </div>
+    <div class="options" id="soptions"></div>
+    <div class="explain" id="explain"></div>
+  </section>
+
+  <!-- 퀴즈 결과 -->
+  <section class="screen result" id="sciResult"></section>
+
+  <!-- 결과 -->
+  <section class="screen result" id="result"></section>
+</div>
+
+<div class="modal" id="stats">
+  <div class="box">
+    <h3>운영자 통계 (키즈)</h3>
+    <p class="hint">이 기기에서 결과가 나온 횟수예요. 향수 재고 확인용.</p>
+    <div id="statRows"></div>
+    <div class="btns"><button id="statReset">초기화</button><button class="close" id="statClose">닫기</button></div>
+  </div>
+</div>
+
+<script>
+/* ===================== 향기 요정 ===================== */
+const SCENTS = {
+  citrus:{ no:1, name:'시트러스', emoji:'🍋', fairy:'레몬 요정', color:'#FFB627', soft:'#FFF1C9',
+    title:'반짝반짝 햇살 친구', mood:['상큼해','신나','씩씩해'],
+    desc:'톡 쏘는 상큼한 향을 좋아하는구나! 이런 향을 좋아하는 너는 아침 햇살처럼 밝은 친구야! 웃음이 많고 뭐든 신나게 해서, 같이 있으면 모두 기분이 좋아져. 톡 쏘는 레몬 향이 너랑 딱 어울려!',
+    notes:['🍋 레몬','🍊 오렌지','🟠 자몽','🍈 라임'] },
+  floral:{ no:2, name:'플로럴', emoji:'🌸', fairy:'꽃 요정', color:'#FF7EB6', soft:'#FFE3EF',
+    title:'마음이 따뜻한 꽃 친구', mood:['다정해','화사해','따뜻해'],
+    desc:'화사한 꽃향기를 좋아하는구나! 이런 향을 좋아하는 너는 친구 마음을 잘 알아주는 다정한 친구야! 예쁜 것을 좋아하고, 작은 일에도 고마워할 줄 알아. 꽃밭에서 나는 향기가 너랑 딱 어울려!',
+    notes:['🌹 장미','🌼 프리지아','🤍 자스민','💮 은방울꽃'] },
+  soap:{ no:3, name:'솝&머스크', emoji:'🫧', fairy:'비눗방울 요정', color:'#5DB8F5', soft:'#DDF0FF',
+    title:'보송보송 깨끗한 구름 친구', mood:['깔끔해','포근해','믿음직해'],
+    desc:'보송보송 깨끗한 향을 좋아하는구나! 이런 향을 좋아하는 너는 늘 깔끔하고 믿음직한 친구야! 옆에 있으면 마음이 편안해지고 포근해. 갓 빨래한 이불 같은 보송보송 비누 향이 너랑 딱 어울려!',
+    notes:['🧼 비누 거품','☁️ 포근한 머스크','👕 깨끗한 빨래','🌬️ 파우더'] },
+  woody:{ no:4, name:'우디', emoji:'🌲', fairy:'나무 요정', color:'#B07D4F', soft:'#F5E7D8',
+    title:'든든하고 차분한 숲 친구', mood:['차분해','든든해','생각이 깊어'],
+    desc:'차분한 숲과 나무 향을 좋아하는구나! 이런 향을 좋아하는 너는 큰 나무처럼 든든한 친구야! 차분하게 생각하고, 친구들 이야기를 잘 들어 줘. 숲속을 걷는 것 같은 나무 향이 너랑 딱 어울려!',
+    notes:['🌲 편백나무','🪵 시더우드','🍃 풀잎','🌰 샌달우드'] },
+  fruit:{ no:5, name:'프루트', emoji:'🍑', fairy:'과일 요정', color:'#FF6157', soft:'#FFE2DE',
+    title:'달콤달콤 분위기 메이커', mood:['귀여워','발랄해','달콤해'],
+    desc:'달콤한 과일 향을 좋아하는구나! 이런 향을 좋아하는 너는 어디서든 분위기를 띄우는 신나는 친구야! 표현을 잘하고 장난도 잘 쳐서 친구들이 좋아해. 달콤한 과일 향이 너랑 딱 어울려!',
+    notes:['🍑 복숭아','🍓 딸기','🍏 청사과','🫐 블루베리'] }
+};
+const ORDER = ['citrus','floral','soap','woody','fruit'];
+
+/* ===================== 질문 (주 향 2점, 보조 향 1점) ===================== */
+const QUESTIONS = [
+  { q:'어떤 냄새를 맡으면 기분이 좋아져?', a:[
+    ['🍊','귤 껍질 깔 때 나는 냄새',{citrus:2,fruit:1}],
+    ['💐','꽃집 앞을 지날 때 나는 냄새',{floral:2,soap:1}],
+    ['🧺','햇볕에 바싹 말린 이불 냄새',{soap:2,woody:1}],
+    ['🌧️','비 온 뒤 숲에서 나는 냄새',{woody:2,citrus:1}],
+    ['🍎','잘 익은 사과 냄새',{fruit:2,floral:1}] ]},
+  { q:'손 씻을 비누를 고른다면?', a:[
+    ['🍋','새콤한 레몬 비누',{citrus:2,soap:1}],
+    ['🌹','향긋한 장미 비누',{floral:2,fruit:1}],
+    ['👶','아기 로션 같은 보송보송 비누',{soap:2,floral:1}],
+    ['🌳','숲 냄새 나는 편백나무 비누',{woody:2,soap:1}],
+    ['🍓','달콤한 딸기 비누',{fruit:2,floral:1}] ]},
+  { q:'먹고 싶은 사탕 맛은?', a:[
+    ['🍋','새콤한 레몬 맛',{citrus:2}],
+    ['🍯','꽃에서 딴 꿀 맛',{floral:2,fruit:1}],
+    ['🥛','부드러운 우유 맛',{soap:2,woody:1}],
+    ['🌰','고소한 군밤 맛',{woody:2}],
+    ['🍑','달콤한 복숭아 맛',{fruit:2,citrus:1}] ]},
+  { q:'봉화에서 맡아 본 냄새 중에 제일 좋은 건?', a:[
+    ['🌲','소나무 숲 냄새',{woody:2,citrus:1}],
+    ['🍎','가을 사과밭 냄새',{fruit:2,floral:1}],
+    ['🌼','봄에 핀 아카시아꽃 냄새',{floral:2,fruit:1}],
+    ['👕','바람에 마른 빨래 냄새',{soap:2,citrus:1}],
+    ['🍵','따뜻한 유자차 냄새',{citrus:2,fruit:1}] ]},
+  { q:'내가 좋아하는 향은 어떤 느낌?', a:[
+    ['⚡','톡 쏘고 상쾌한 향',{citrus:2,soap:1}],
+    ['🎀','화사하고 예쁜 향',{floral:2,fruit:1}],
+    ['☁️','은은하고 포근한 향',{soap:2,floral:1}],
+    ['🪵','차분하고 묵직한 향',{woody:2,soap:1}],
+    ['🍬','달콤하고 진한 향',{fruit:2,floral:1}] ]},
+  { q:'냄새가 좋아서 들어가 보고 싶은 가게는?', a:[
+    ['🧃','오렌지 주스 가게',{citrus:2,fruit:1}],
+    ['💐','꽃집',{floral:2,soap:1}],
+    ['🫧','보송보송 빨래방',{soap:2,citrus:1}],
+    ['🪚','나무 냄새 나는 목공방',{woody:2}],
+    ['🍰','과일 케이크 가게',{fruit:2,floral:1}] ]},
+  { q:'향수를 뿌렸을 때 친구가 이렇게 말해 주면 좋겠어!', a:[
+    ['😆','“너한테 상큼한 냄새 나!”',{citrus:2,fruit:1}],
+    ['🥰','“너한테 꽃향기 나!”',{floral:2,fruit:1}],
+    ['😊','“너한테 깨끗한 냄새 나!”',{soap:2,woody:1}],
+    ['😌','“숲에 온 것처럼 편안해!”',{woody:2,soap:1}],
+    ['🤤','“너한테 달콤한 냄새 나!”',{fruit:2,citrus:1}] ]}
+];
+
+/* ===================== 그림 & 효과 ===================== */
+const $ = id => document.getElementById(id);
+function mascotSVG(color){
+  return `<svg class="mascot" viewBox="0 0 100 120" aria-hidden="true">
+    <path d="M50 2 l4 8 9 1 -7 6 2 9 -8-5 -8 5 2-9 -7-6 9-1z" fill="#FFD84D"/>
+    <rect x="38" y="24" width="24" height="14" rx="5" fill="#B48CFF"/>
+    <rect x="42" y="36" width="16" height="8" fill="#E6D9FF"/>
+    <rect x="10" y="42" width="80" height="74" rx="30" fill="#fff" stroke="#F1D5E4" stroke-width="3"/>
+    <path d="M14 80 Q50 66 86 80 L86 92 Q86 112 60 112 L40 112 Q14 112 14 92z" fill="${color}" opacity=".8"/>
+    <g class="blink"><ellipse cx="36" cy="64" rx="5" ry="7" fill="#4A3B52"/><ellipse cx="64" cy="64" rx="5" ry="7" fill="#4A3B52"/>
+    <circle cx="38" cy="61" r="2" fill="#fff"/><circle cx="66" cy="61" r="2" fill="#fff"/></g>
+    <ellipse class="cheek" cx="26" cy="75" rx="7" ry="4" fill="#FF9EC4"/><ellipse class="cheek" cx="74" cy="75" rx="7" ry="4" fill="#FF9EC4"/>
+    <path d="M43 74 Q50 81 57 74" stroke="#4A3B52" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="18" y="50" width="7" height="20" rx="3.5" fill="#fff" opacity=".9"/>
+  </svg>`;
+}
+$('introMascot').innerHTML = mascotSVG('#FFB3D0');
+$('qMascot').innerHTML = mascotSVG('#FFB3D0');
+$('title').innerHTML = [...'퍼스널 향찾기'].map((c,i)=> c===' ' ? '<br>' :
+  `<span class="w" style="animation-delay:${i*0.1}s;color:${['#FFB627','#FF7EB6','#5DB8F5','#B07D4F','#FF6157','#B48CFF'][i%6]}">${c}</span>`).join('');
+
+// 배경에 떠다니는 것들
+(function(){
+  const items=['🫧','✨','🍋','🌸','🫧','🌲','🍑','⭐','🫧','💖'];
+  const box=$('floaties');
+  for(let i=0;i<16;i++){
+    const s=document.createElement('span'); s.textContent=items[i%items.length];
+    s.style.left=(Math.random()*95)+'%'; s.style.fontSize=(20+Math.random()*22)+'px';
+    s.style.animationDuration=(12+Math.random()*14)+'s'; s.style.animationDelay=(-Math.random()*20)+'s';
+    box.appendChild(s);
+  }
+})();
+
+// 터치하면 반짝이
+function sparkle(x,y){
+  const icons=['✨','⭐','💖','🌟'];
+  for(let i=0;i<7;i++){
+    const s=document.createElement('span'); s.className='spark'; s.textContent=icons[i%icons.length];
+    const ang=Math.PI*2*i/7, d=50+Math.random()*30;
+    s.style.left=(x-11)+'px'; s.style.top=(y-11)+'px';
+    s.style.setProperty('--dx',Math.cos(ang)*d+'px'); s.style.setProperty('--dy',Math.sin(ang)*d+'px');
+    document.body.appendChild(s); setTimeout(()=>s.remove(),850);
+  }
+}
+window.addEventListener('pointerdown',e=>sparkle(e.clientX,e.clientY));
+
+// 효과음 (Web Audio, 파일 없이)
+let soundOn=true, actx=null;
+function tone(freqs,dur=0.09,type='sine',vol=0.12){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{
+      const o=actx.createOscillator(), g=actx.createGain(), t=actx.currentTime+i*dur;
+      o.type=type; o.frequency.setValueAtTime(f,t);
+      g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+dur*1.6);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t+dur*1.7);
+    });
+  }catch(e){}
+}
+const sfx={ pop:()=>tone([660,990],0.07), start:()=>tone([523,659,784],0.1),
+  drip:()=>tone([880,1320],0.05,'triangle',0.08), win:()=>tone([523,659,784,1047,784,1047],0.12,'triangle') };
+$('soundBtn').onclick=()=>{ soundOn=!soundOn; $('soundBtn').textContent=soundOn?'🔊':'🔇'; };
+
+function confetti(colors){
+  for(let i=0;i<90;i++){
+    const c=document.createElement('i'); c.className='confetti';
+    c.style.left=Math.random()*100+'vw'; c.style.background=colors[i%colors.length];
+    c.style.setProperty('--dx',(Math.random()*200-100)+'px'); c.style.setProperty('--rot',(Math.random()*1080)+'deg');
+    c.style.animationDuration=(2.2+Math.random()*2)+'s'; c.style.animationDelay=(Math.random()*.6)+'s';
+    if(i%3===0) c.style.borderRadius='50%';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),5000);
+  }
+}
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); window.scrollTo(0,0); }
+const STORE_KEY='scentStatsKids2026';
+function loadStats(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY))||{}; }catch(e){ return {}; } }
+function saveStats(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){} }
+function escapeHTML(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ===================== 진행 ===================== */
+let answers=[], qi=0, shuffled=[], locked=false;
+const CARD_COLORS=['#FFD27A','#FFB3D0','#A9DBFF','#D9B896','#FFA79F'];
+
+$('startBtn').onclick=()=>{
+  sfx.start();
+  answers=new Array(QUESTIONS.length).fill(null);
+  shuffled=QUESTIONS.map(q=>shuffle(q.a));
+  qi=0; renderQ(); show('quiz');
+};
+
+function renderQ(){
+  const total=QUESTIONS.length, p=qi/total*100;
+  $('qnum').textContent=`${qi+1}번째 질문 (${qi+1}/${total})`;
+  $('qtext').textContent=QUESTIONS[qi].q;
+  $('fill').style.width=p+'%'; $('runner').style.left=Math.max(p,3)+'%';
+  $('backBtn').disabled=qi===0;
+  const box=$('options'); box.innerHTML='';
+  shuffled[qi].forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'+(answers[qi]===opt?' picked':'');
+    b.style.setProperty('--c',CARD_COLORS[i%CARD_COLORS.length]);
+    b.style.animationDelay=(i*0.08)+'s';
+    b.innerHTML=`<span class="em" style="animation-delay:${i*0.3}s">${opt[0]}</span><span>${opt[1]}</span>`;
+    b.onclick=()=>pick(opt,b);
+    box.appendChild(b);
+  });
+  // 질문 말풍선도 톡 튀어나오게
+  const bub=document.querySelector('.bubble'); bub.style.animation='none'; void bub.offsetWidth; bub.style.animation='popIn .5s cubic-bezier(.34,1.56,.64,1)';
+}
+function pick(opt,el){
+  if(locked) return; locked=true; sfx.pop();
+  answers[qi]=opt;
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
+  el.classList.add('picked');
+  setTimeout(()=>{
+    locked=false;
+    if(qi<QUESTIONS.length-1){ qi++; renderQ(); }
+    else { $('fill').style.width='100%'; $('runner').style.left='100%'; setTimeout(startBlend,300); }
+  },520);
+}
+$('backBtn').onclick=()=>{ if(qi>0){ qi--; renderQ(); } };
+
+/* ===================== 결과 계산 ===================== */
+function calc(){
+  const score={citrus:0,floral:0,soap:0,woody:0,fruit:0}, firsts={citrus:0,floral:0,soap:0,woody:0,fruit:0};
+  answers.forEach(a=>{ for(const k in a[2]){ score[k]+=a[2][k]; if(a[2][k]===2) firsts[k]++; } });
+  const rank=shuffle(ORDER).sort((x,y)=>(score[y]-score[x])||(firsts[y]-firsts[x]));
+  const sum=Object.values(score).reduce((p,c)=>p+c,0);
+  return {score,rank,sum};
+}
+
+/* ===================== 블렌딩: 플라스크에 방울 떨어뜨리기 ===================== */
+function startBlend(){
+  const {score,rank,sum}=calc();
+  const glass=$('glass'); glass.innerHTML='';
+  for(let i=0;i<8;i++){ const b=document.createElement('i'); b.className='bub';
+    b.style.left=(10+Math.random()*80)+'%'; b.style.animationDelay=(Math.random()*1.4)+'s'; glass.appendChild(b); }
+  show('blend');
+  // 점수가 낮은 향부터 아래에 쌓이도록
+  const order=rank.slice().reverse(); let acc=0;
+  order.forEach((k,i)=>{
+    setTimeout(()=>{
+      const d=document.createElement('div'); d.className='drop go'; d.style.background=SCENTS[k].color;
+      $('flask').appendChild(d); setTimeout(()=>d.remove(),600); sfx.drip();
+      setTimeout(()=>{
+        const h=score[k]/sum*92;
+        const layer=document.createElement('div'); layer.className='layer';
+        layer.style.background=SCENTS[k].color; layer.style.bottom=acc+'%'; acc+=h;
+        glass.insertBefore(layer,glass.firstChild); requestAnimationFrame(()=>layer.style.height=h+'%');
+      },450);
+    }, 300+i*500);
+  });
+  setTimeout(()=>showResult(score,rank,sum), 300+order.length*500+900);
+}
+
+/* ===================== 결과 화면 ===================== */
+function showResult(score,rank,sum){
+  const main=SCENTS[rank[0]], sub=SCENTS[rank[1]];
+
+  const st=loadStats(); st[rank[0]]=(st[rank[0]]||0)+1; saveStats(st);
+  const pct=k=>Math.round(score[k]/sum*100);
+  const el=$('result');
+  el.style.setProperty('--tone',main.color); el.style.setProperty('--soft',main.soft);
+  el.innerHTML=`
+    <div class="hero">
+      <div class="rays"></div>
+      <div class="who">너는 바로바로~</div>
+      <div class="fairy">${main.emoji}</div>
+      <div class="scent">${main.fairy}!</div>
+      <div class="title">“${main.title}”</div>
+      <div class="tags">${main.mood.map((m,i)=>`<span style="animation-delay:${0.8+i*0.15}s">#${m}</span>`).join('')}</div>
+    </div>
+    <div class="pickup">
+      <div class="no">${main.no}</div>
+      <div><b>${main.no}번 ${main.name} 향수를 받아 가요! 🎁</b><small>이 화면을 언니·오빠들에게 보여 줘</small></div>
+    </div>
+    <div class="card" style="animation-delay:1.1s"><h3>💌 뿌뿌가 알려 줄게</h3><p>${main.desc}</p></div>
+    <div class="card" style="animation-delay:1.25s"><h3>🧪 이런 향이 들어 있어</h3>
+      <div class="notes">${main.notes.map(n=>`<span>${n}</span>`).join('')}</div></div>
+    <div class="card" style="animation-delay:1.4s"><h3>📊 나의 향기 점수</h3>
+      <div class="bars">${rank.map(k=>`<div class="bar"><span class="n">${SCENTS[k].emoji}</span>
+        <div class="t"><i data-w="${pct(k)}" style="background:${SCENTS[k].color}"></i></div><span class="v">${pct(k)}%</span></div>`).join('')}</div>
+      <p style="margin-top:12px;font-size:17px;color:var(--sub)">두 번째 단짝 요정은 <b style="color:${sub.color}">${sub.emoji} ${sub.fairy}</b>야!</p>
+    </div>
+    <div class="actions"><button class="btn sci" id="toSciBtn">🧪 과학 퀴즈 <small>간식 도전!</small></button><button class="btn" id="againBtn">처음으로 🏠</button></div>
+    <p class="idle">2분 동안 아무것도 안 누르면 처음 화면으로 돌아가요.</p>`;
+  show('result'); sfx.win();
+  confetti([main.color,'#FF8FB8','#B48CFF','#FFD84D','#5DB8F5']);
+  setTimeout(()=>el.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%'),1600);
+  $('againBtn').onclick=reset;
+  $('toSciBtn').onclick=startSci;
+}
+function reset(){ answers=[]; qi=0; show('intro'); }
+
+/* ===================== 향기 과학 퀴즈 (5문제, 3개 이상 맞히면 간식) =====================
+   형식: { q:문제, a:[[이모지,보기],...], c:정답 인덱스, e:해설 }  — O/X 문제는 a를 'OX'로 */
+const SCI_BANK = [
+  { q:'향수를 뿌리면 냄새가 멀리까지 퍼져요. 이걸 뭐라고 할까?', a:[['🌬️','확산'],['🪞','반사'],['🧲','자석']], c:0,
+    e:'냄새 알갱이가 스스로 움직이면서 멀리멀리 퍼지는 걸 <b>확산</b>이라고 해!' },
+  { q:'우리는 냄새를 어디로 맡을까?', a:[['👃','코'],['👂','귀'],['👀','눈']], c:0,
+    e:'<b>코 안쪽</b>에 냄새를 알아채는 세포가 있어서 냄새를 맡을 수 있어!' },
+  { q:'냄새가 더 빨리 퍼지는 곳은 어디일까?', a:[['☀️','따뜻한 곳'],['❄️','추운 곳']], c:0,
+    e:'따뜻하면 냄새 알갱이가 더 신나게 움직여서 <b>더 빨리 퍼져!</b>' },
+  { q:'같은 냄새를 오래 맡고 있으면 냄새가 잘 안 느껴진다!', a:'OX', c:0,
+    e:'코가 금방 익숙해져서 <b>냄새를 잘 못 느끼게</b> 돼. 그래서 향을 맡을 땐 잠깐씩 쉬어야 해.' },
+  { q:'레몬 향은 레몬의 어디에서 가장 많이 날까?', a:[['🍋','노란 껍질'],['🌱','씨앗'],['🍃','잎']], c:0,
+    e:'레몬·귤의 <b>껍질</b>에 향기 기름이 가득 들어 있어. 귤을 까면 손에서 좋은 냄새가 나지?' },
+  { q:'향수를 손에 뿌리면 금방 마르는 건, 향수가 공기 중으로 날아가기 때문이다!', a:'OX', c:0,
+    e:'액체가 공기 중으로 날아가는 걸 <b>증발</b>이라고 해. 향수가 날아가면서 향기도 함께 퍼져.' },
+  { q:'바람이 하나도 없으면 냄새는 전혀 퍼지지 않는다!', a:'OX', c:1,
+    e:'바람이 없어도 냄새 알갱이는 <b>스스로 꼼지락꼼지락 움직여서</b> 퍼져 나가!' },
+  { q:'꽃이 좋은 향기를 내는 이유는 뭘까?', a:[['🐝','벌과 나비를 부르려고'],['🌧️','비를 부르려고'],['🌙','밤을 부르려고']], c:0,
+    e:'꽃은 향기로 <b>벌과 나비를 불러서</b> 꽃가루를 옮기게 해. 그래야 열매와 씨앗을 만들 수 있거든!' },
+  { q:'물에 물감을 한 방울 떨어뜨리면 어떻게 될까?', a:[['🌈','천천히 퍼진다'],['⚫','한 점으로 그대로 있다'],['🎈','위로 날아간다']], c:0,
+    e:'물 속에서도 알갱이가 움직여서 물감이 <b>천천히 퍼져</b>. 이것도 확산이야!' },
+  { q:'코를 꼭 막고 음식을 먹으면 맛이 잘 안 느껴진다!', a:'OX', c:0,
+    e:'맛을 느낄 때 <b>냄새도 큰 역할</b>을 해. 감기 걸리면 음식 맛이 덜 나는 것도 그래서야.' },
+  { q:'강아지는 사람보다 냄새를 훨씬 잘 맡는다!', a:'OX', c:0,
+    e:'강아지 코에는 냄새를 맡는 세포가 사람보다 <b>훨씬 많아</b>. 그래서 탐지견이 활약할 수 있어.' }
+];
+const SCI_N=5, SCI_PASS=3;
+let sciQs=[], si=0, sciScore=0, sciLocked=false;
+$('sMascot').innerHTML = mascotSVG('#C7E9FF');
+
+function startSci(){
+  sfx.start();
+  sciQs=shuffle(SCI_BANK).slice(0,SCI_N).map(q=>{
+    if(q.a==='OX') return {...q, a:[['⭕','O'],['❌','X']], ox:true};
+    const order=shuffle(q.a.map((_,i)=>i));
+    return {...q, a:order.map(i=>q.a[i]), c:order.indexOf(q.c)};
+  });
+  si=0; sciScore=0;
+  const st=loadStats(); st.sciTry=(st.sciTry||0)+1; saveStats(st);
+  renderSci(); show('sci');
+}
+function renderSci(){
+  const Q=sciQs[si];
+  $('snum').textContent=`과학 퀴즈 ${si+1}번 (${si+1}/${SCI_N})`;
+  $('stext').textContent=Q.q;
+  $('stars').innerHTML=sciQs.map((q,i)=>`<span class="${q.res||''}${i===si?' cur':''}">${q.res==='ok'?'⭐':q.res==='no'?'💧':'○'}</span>`).join('');
+  $('explain').className='explain'; $('explain').innerHTML='';
+  const box=$('soptions'); box.innerHTML=''; box.classList.toggle('ox',!!Q.ox);
+  Q.a.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.style.setProperty('--c',CARD_COLORS[(i+2)%CARD_COLORS.length]);
+    b.style.animationDelay=(i*0.08)+'s';
+    b.innerHTML=`<span class="em" style="animation-delay:${i*0.3}s">${opt[0]}</span>${Q.ox?'':`<span>${opt[1]}</span>`}`;
+    b.onclick=()=>answerSci(i,b);
+    box.appendChild(b);
+  });
+  const bub=$('sci').querySelector('.bubble'); bub.style.animation='none'; void bub.offsetWidth; bub.style.animation='popIn .5s cubic-bezier(.34,1.56,.64,1)';
+  sciLocked=false;
+}
+function answerSci(i,el){
+  if(sciLocked) return; sciLocked=true;
+  const Q=sciQs[si], ok=i===Q.c;
+  if(ok){ sciScore++; tone([784,1047,1319],0.09,'triangle'); } else tone([392,330],0.14,'sine');
+  Q.res=ok?'ok':'no';
+  [...$('soptions').children].forEach((o,j)=>{ o.disabled=true; if(j===Q.c) o.classList.add('right'); });
+  if(!ok) el.classList.add('wrong');
+  $('stars').children[si].textContent=ok?'⭐':'💧'; $('stars').children[si].className=Q.res+' cur';
+  const last=si===sciQs.length-1;
+  const ans=Q.ox ? Q.a[Q.c][1] : Q.a[Q.c][0]+' '+Q.a[Q.c][1];
+  $('explain').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'딩동댕! 정답이야 🎉':'아쉬워! 정답은 '+ans}</div>
+    <p>${Q.e}</p><button class="btn" id="sciNext">${last?'결과 보기 🎁':'다음 문제 ▶'}</button>`;
+  $('explain').className='explain show';
+  setTimeout(()=>$('explain').scrollIntoView({behavior:'smooth',block:'nearest'}),150);
+  $('sciNext').onclick=()=>{ if(last) sciResult(); else { si++; renderSci(); window.scrollTo(0,0); } };
+}
+function sciResult(){
+  const pass=sciScore>=SCI_PASS;
+  if(pass){ const st=loadStats(); st.sciPass=(st.sciPass||0)+1; saveStats(st); }
+  const el=$('sciResult');
+  el.style.setProperty('--tone', pass?'#FF7EB6':'#9AB7D3'); el.style.setProperty('--soft', pass?'#FFE3EF':'#E8F1FA');
+  el.innerHTML=`
+    <div class="hero">
+      <div class="rays"></div>
+      <div class="who">과학 퀴즈 결과는~</div>
+      <div class="score-stars">${sciQs.map((q,i)=>`<span style="animation-delay:${0.3+i*0.2}s">${q.res==='ok'?'⭐':'💧'}</span>`).join('')}</div>
+      <div class="scent">${sciScore}개 맞혔어!</div>
+      ${pass
+        ? `<div class="snacks"><span>🍪</span><span>🍬</span><span>🍭</span></div>
+           <div class="title">“과학 박사 인정! 간식 받아 가요!”</div>`
+        : `<div class="snacks sad"><span>🤔</span></div>
+           <div class="title">“${SCI_PASS}개 이상 맞히면 간식을 받을 수 있어!”</div>`}
+    </div>
+    ${pass
+      ? `<div class="pickup"><div class="no">🎁</div><div><b>간식을 받아 가요!</b><small>이 화면을 언니·오빠들에게 보여 줘</small></div></div>`
+      : `<div class="pickup"><div class="no">💪</div><div><b>다시 도전해 볼까?</b><small>문제가 새로 바뀌어!</small></div></div>`}
+    <div class="card"><h3>💡 오늘 배운 향기 과학</h3><p>냄새가 멀리 퍼지는 건 <b>확산</b>, 향수가 날아가는 건 <b>증발</b>, 냄새를 맡는 건 <b>코 속 세포</b> 덕분이야!</p></div>
+    <div class="actions">${pass?'':'<button class="btn sci" id="sciRetry">다시 도전 🔄</button>'}<button class="btn" id="sciHome2">처음으로 🏠</button></div>`;
+  show('sciResult');
+  if(pass){ sfx.win(); confetti(['#FF8FB8','#FFD84D','#B48CFF','#5DB8F5','#C08A5A']); } else tone([523,440,392],0.12);
+  if($('sciRetry')) $('sciRetry').onclick=startSci;
+  $('sciHome2').onclick=reset;
+}
+$('sciStartBtn').onclick=startSci;
+$('sciHome').onclick=reset;
+$('soundBtn2').onclick=()=>{ $('soundBtn').click(); $('soundBtn2').textContent=$('soundBtn').textContent; };
+
+/* ===================== 자동 초기화 ===================== */
+let idleTimer;
+function bumpIdle(){ clearTimeout(idleTimer); idleTimer=setTimeout(()=>{ if(!$('intro').classList.contains('active')) reset(); },120000); }
+['pointerdown','keydown','scroll','touchstart'].forEach(ev=>window.addEventListener(ev,bumpIdle,{passive:true}));
+bumpIdle();
+
+/* ===================== 운영자 통계 (배지 5번 연속 터치) ===================== */
+let taps=0, tapTimer;
+$('secret').addEventListener('click',()=>{ taps++; clearTimeout(tapTimer); tapTimer=setTimeout(()=>taps=0,1500); if(taps>=5){ taps=0; openStats(); } });
+function openStats(){
+  const st=loadStats(); let total=0;
+  $('statRows').innerHTML=ORDER.map(k=>{ const n=st[k]||0; total+=n;
+    return `<div class="row"><span>${SCENTS[k].no}번 ${SCENTS[k].emoji} ${SCENTS[k].name}</span><b>${n}명</b></div>`; }).join('')
+    +`<div class="row"><span>향 찾기 합계</span><b>${total}명</b></div>`
+    +`<div class="row"><span>과학 퀴즈 도전</span><b>${st.sciTry||0}번</b></div>`
+    +`<div class="row"><span>간식 지급 (3개 이상)</span><b>${st.sciPass||0}명</b></div>`;
+  $('stats').classList.add('show');
+}
+$('statClose').onclick=()=>$('stats').classList.remove('show');
+// 확인창(confirm)이 막히는 환경이 있어서 두 번 눌러 초기화
+let resetArm=false, resetT;
+$('statReset').onclick=()=>{
+  const b=$('statReset');
+  if(!resetArm){ resetArm=true; b.textContent='한 번 더 누르면 초기화'; clearTimeout(resetT); resetT=setTimeout(()=>{ resetArm=false; b.textContent='초기화'; },3000); return; }
+  resetArm=false; b.textContent='초기화'; saveStats({}); openStats();
+};
+</script>
+</body>
+</html>

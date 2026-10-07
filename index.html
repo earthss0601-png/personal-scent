@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>퍼스널 향찾기</title>
+<meta name="description" content="2026 봉화 교육 한마당 · 춘양중학교 센트 사이언스 동아리 부스">
+<style>
+  :root{
+    color-scheme:light;
+    --ink:#3B3346; --ink-2:#5E5568; --mute:#9A8FA6; --hair:#E5DAEA;
+    --pink:#EE8FB2; --blue:#5DB8F5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo",sans-serif;color:var(--ink);
+    background:#FBF6FB;
+    background-image:
+      radial-gradient(700px 520px at 0% 0%, #FDE4DA 0%, transparent 65%),
+      radial-gradient(680px 520px at 100% 8%, #E6E0FA 0%, transparent 65%),
+      radial-gradient(760px 560px at 85% 80%, #DDF1EA 0%, transparent 65%),
+      radial-gradient(700px 560px at 5% 95%, #FFF1C9 0%, transparent 65%);
+    background-attachment:fixed;
+    display:flex;align-items:center;justify-content:center;padding:32px 16px;
+  }
+  .wrap{width:100%;max-width:720px;text-align:center}
+  .cap{font-size:12px;letter-spacing:.24em;color:var(--mute);font-weight:700;text-transform:uppercase}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(40px,9vw,72px);line-height:1.05;margin:16px 0 8px}
+  h1 em{color:var(--ink-2)}
+  h2{font-size:clamp(24px,5vw,34px);font-weight:800;letter-spacing:-.02em}
+  .lead{margin:14px auto 34px;font-size:17px;line-height:1.8;color:var(--ink-2);max-width:460px;word-break:keep-all}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:560px){.cards{grid-template-columns:1fr}.lead br{display:none}}
+  a.card{
+    display:flex;flex-direction:column;align-items:center;gap:10px;text-decoration:none;color:var(--ink);
+    background:rgba(255,255,255,.72);border:1px solid #fff;padding:30px 20px 26px;
+    box-shadow:0 14px 34px rgba(150,110,170,.16);transition:transform .2s, box-shadow .2s;
+    animation:up .7s cubic-bezier(.2,.7,.2,1) both
+  }
+  a.card:nth-child(2){animation-delay:.12s}
+  a.card:hover,a.card:focus-visible{transform:translateY(-4px);box-shadow:0 20px 40px rgba(150,110,170,.24);outline:none}
+  a.card:focus-visible{outline:3px solid var(--pink);outline-offset:3px}
+  @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .card .icon{font-size:52px;line-height:1;animation:bob 3s ease-in-out infinite}
+  .card:nth-child(2) .icon{animation-delay:.5s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+  .card b{font-size:22px}
+  .card span{font-size:15px;color:var(--ink-2);line-height:1.6;word-break:keep-all}
+  .card .go{margin-top:6px;font-size:15px;font-weight:800;color:#fff;padding:10px 22px;border-radius:999px}
+  .teen .go{background:var(--ink)}
+  .kids .go{background:linear-gradient(180deg,#FF9EC4,#FF6FA5)}
+  footer{margin-top:34px;font-size:13px;color:var(--mute);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="cap">2026 봉화 교육 한마당 · 2026. 11. 4.</div>
+  <h1>Find your<br><em>own scent.</em></h1>
+  <h2>퍼스널 향찾기</h2>
+  <p class="lead">설문으로 나에게 어울리는 향과 분위기를 찾고,<br>향 과학 퀴즈에 도전해 간식도 받아 가세요!</p>
+  <div class="cards">
+    <a class="card teen" href="teen.html">
+      <div class="icon">🧪</div>
+      <b>중학생 이상</b>
+      <span>후각 취향 진단 리포트<br>+ 향 과학 퀴즈</span>
+      <div class="go">시작하기 →</div>
+    </a>
+    <a class="card kids" href="kids.html">
+      <div class="icon">🌸</div>
+      <b>초등학생</b>
+      <span>나와 닮은 향기 요정 찾기<br>+ 향기 과학 퀴즈</span>
+      <div class="go">시작하기 →</div>
+    </a>
+  </div>
+  <footer>춘양중학교 센트 사이언스(Scent Science) 동아리</footer>
+</div>
+</body>
+</html>
