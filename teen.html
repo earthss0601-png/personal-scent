@@ -157,6 +157,12 @@
   .two{display:grid;grid-template-columns:1fr 1fr;gap:34px}
   @media (max-width:640px){.two{grid-template-columns:1fr;gap:10px}}
   .prose{font-size:17px;line-height:1.95;color:var(--ink-2);word-break:keep-all}
+  .story{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:30px;align-items:start}
+  .story figure{position:relative;margin:0}
+  .story img{display:block;width:100%;height:auto;aspect-ratio:720/912;object-fit:cover;box-shadow:0 14px 30px rgba(60,40,70,.16)}
+  .story figcaption{position:absolute;right:-22px;top:0;writing-mode:vertical-rl;font-size:11px;letter-spacing:.22em;color:var(--ink-2);text-transform:uppercase}
+  .story .prose + .prose{margin-top:14px}
+  @media (max-width:640px){.story{grid-template-columns:1fr;gap:16px}.story img{aspect-ratio:4/3}.story figcaption{right:auto;left:10px;top:auto;bottom:10px;writing-mode:horizontal-tb;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)}}
   .prose b{color:var(--ink)}
 
   /* 노트 피라미드 */
@@ -762,9 +768,12 @@ function showReport({rank,pct}){
 
     <div class="sec reveal" style="animation-delay:.3s">
       <div class="sec-h"><span class="i">i.</span><h4>향 계열과 나의 분위기</h4><span class="cap">Family & Mood</span></div>
-      <div class="two">
-        <p class="prose">${s.family}</p>
-        <p class="prose">${s.persona}</p>
+      <div class="story">
+        <figure><img src="img/scent-${k}.jpg" width="720" height="912" alt="${s.name} 향을 표현한 사진"><figcaption>${s.en}</figcaption></figure>
+        <div>
+          <p class="prose">${s.family}</p>
+          <p class="prose">${s.persona}</p>
+        </div>
       </div>
     </div>
 
