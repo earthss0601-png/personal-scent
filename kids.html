@@ -8,7 +8,7 @@
   :root{
     --bg:#FFF8EE; --ink:#4A3B52; --sub:#8D7F95; --line:#F1E3D3;
     --pink:#FF8FB8; --purple:#B48CFF;
-    --citrus:#FFB627; --floral:#FF7EB6; --soap:#5DB8F5; --woody:#B07D4F; --fruit:#FF6157;
+    --citrus:#FF8A1F; --floral:#FF7EB6; --soap:#5DB8F5; --woody:#B07D4F;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
@@ -147,6 +147,17 @@
   .pickup .no{flex:0 0 auto;width:72px;height:72px;border-radius:50%;background:var(--tone);color:#fff;display:grid;place-items:center;font-size:36px;font-weight:900;animation:wiggle 1s ease-in-out infinite}
   .pickup b{font-size:21px;display:block;font-weight:900;word-break:keep-all}
   .pickup small{font-size:15px;color:var(--sub);font-weight:700}
+  .opt.mode{min-height:190px}
+  .opt.mode .em{font-size:64px}
+  .opt small{font-size:15px;font-weight:700;color:var(--sub);line-height:1.4}
+  .recipe .step{display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:12px;padding:10px 0;border-bottom:2px dashed var(--line)}
+  .recipe .step:last-of-type{border-bottom:none}
+  .recipe .num{width:46px;height:46px;border-radius:50%;color:#fff;display:grid;place-items:center;font-size:24px;font-weight:900}
+  .recipe .step b{font-size:19px;font-weight:900;word-break:keep-all}
+  .recipe .drops{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .recipe .drops i{width:16px;height:16px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);animation:cardIn .4s both cubic-bezier(.34,1.56,.64,1)}
+  .recipe .cnt{font-size:26px;font-weight:900;white-space:nowrap}
+  .recipe .tip{font-size:17px;color:var(--sub);margin-top:8px}
   .card{background:#fff;border-radius:26px;padding:20px;box-shadow:0 6px 0 var(--line);animation:popIn .6s both}
   .card h3{font-size:19px;font-weight:900;margin-bottom:10px}
   .card p{font-size:19px;line-height:1.7;font-weight:700;word-break:keep-all}
@@ -216,8 +227,8 @@
     <div class="speech">안녕! 나는 향기 요정 <b style="color:var(--pink)">뿌뿌</b>야~</div>
     <div class="bounce" id="introMascot" style="width:150px"></div>
     <h1 id="title"></h1>
-    <p class="lead">질문 7개에 답하면<br>나랑 꼭 닮은 <b style="color:var(--pink)">향기 요정</b>을 찾아 줄게!</p>
-    <div class="friends"><span>🍋</span><span>🌸</span><span>🫧</span><span>🌲</span><span>🍑</span></div>
+    <p class="lead">질문에 답하면<br>나랑 꼭 닮은 <b style="color:var(--pink)">향기 요정</b>을 찾아 줄게!</p>
+    <div class="friends"><span>🍊</span><span>🌸</span><span>🫧</span><span>🌲</span></div>
     <button class="btn" id="startBtn">시작하기 ✨</button>
     <button class="btn sci" id="sciStartBtn">🧪 과학 퀴즈 <small>간식 도전!</small></button>
     <p class="org">춘양중학교 향기 연구 동아리 · 센트 사이언스</p>
@@ -282,10 +293,10 @@
 <script>
 /* ===================== 향기 요정 ===================== */
 const SCENTS = {
-  citrus:{ no:1, name:'시트러스', emoji:'🍋', fairy:'레몬 요정', color:'#FFB627', soft:'#FFF1C9',
-    title:'반짝반짝 햇살 친구', mood:['상큼해','신나','씩씩해'],
-    desc:'톡 쏘는 상큼한 향을 좋아하는구나! 이런 향을 좋아하는 너는 아침 햇살처럼 밝은 친구야! 웃음이 많고 뭐든 신나게 해서, 같이 있으면 모두 기분이 좋아져. 톡 쏘는 레몬 향이 너랑 딱 어울려!',
-    notes:['🍋 레몬','🍊 오렌지','🟠 자몽','🍈 라임'] },
+  citrus:{ no:1, name:'시트러스&프루트', emoji:'🍊', fairy:'과일 요정', color:'#FF8A1F', soft:'#FFEBD2',
+    title:'상큼달콤 햇살 친구', mood:['상큼해','달콤해','신나'],
+    desc:'상큼하고 달콤한 과일 향을 좋아하는구나! 이런 향을 좋아하는 너는 아침 햇살처럼 밝고 신나는 친구야! 웃음이 많고 표현을 잘해서, 같이 있으면 모두 기분이 좋아져. 톡 쏘는 레몬과 달콤한 복숭아 향이 너랑 딱 어울려!',
+    notes:['🍋 레몬','🍊 오렌지','🍑 복숭아','🍓 딸기'] },
   floral:{ no:2, name:'플로럴', emoji:'🌸', fairy:'꽃 요정', color:'#FF7EB6', soft:'#FFE3EF',
     title:'마음이 따뜻한 꽃 친구', mood:['다정해','화사해','따뜻해'],
     desc:'화사한 꽃향기를 좋아하는구나! 이런 향을 좋아하는 너는 친구 마음을 잘 알아주는 다정한 친구야! 예쁜 것을 좋아하고, 작은 일에도 고마워할 줄 알아. 꽃밭에서 나는 향기가 너랑 딱 어울려!',
@@ -297,58 +308,47 @@ const SCENTS = {
   woody:{ no:4, name:'우디', emoji:'🌲', fairy:'나무 요정', color:'#B07D4F', soft:'#F5E7D8',
     title:'든든하고 차분한 숲 친구', mood:['차분해','든든해','생각이 깊어'],
     desc:'차분한 숲과 나무 향을 좋아하는구나! 이런 향을 좋아하는 너는 큰 나무처럼 든든한 친구야! 차분하게 생각하고, 친구들 이야기를 잘 들어 줘. 숲속을 걷는 것 같은 나무 향이 너랑 딱 어울려!',
-    notes:['🌲 편백나무','🪵 시더우드','🍃 풀잎','🌰 샌달우드'] },
-  fruit:{ no:5, name:'프루트', emoji:'🍑', fairy:'과일 요정', color:'#FF6157', soft:'#FFE2DE',
-    title:'달콤달콤 분위기 메이커', mood:['귀여워','발랄해','달콤해'],
-    desc:'달콤한 과일 향을 좋아하는구나! 이런 향을 좋아하는 너는 어디서든 분위기를 띄우는 신나는 친구야! 표현을 잘하고 장난도 잘 쳐서 친구들이 좋아해. 달콤한 과일 향이 너랑 딱 어울려!',
-    notes:['🍑 복숭아','🍓 딸기','🍏 청사과','🫐 블루베리'] }
+    notes:['🌲 편백나무','🪵 시더우드','🍃 풀잎','🌰 샌달우드'] }
 };
-const ORDER = ['citrus','floral','soap','woody','fruit'];
+const ORDER = ['citrus','floral','soap','woody'];
 
 /* ===================== 질문 (주 향 2점, 보조 향 1점) ===================== */
 const QUESTIONS = [
   { q:'어떤 냄새를 맡으면 기분이 좋아져?', a:[
-    ['🍊','귤 껍질 깔 때 나는 냄새',{citrus:2,fruit:1}],
+    ['🍊','귤 까고 사과 자를 때 나는 냄새',{citrus:2,floral:1}],
     ['💐','꽃집 앞을 지날 때 나는 냄새',{floral:2,soap:1}],
     ['🧺','햇볕에 바싹 말린 이불 냄새',{soap:2,woody:1}],
-    ['🌧️','비 온 뒤 숲에서 나는 냄새',{woody:2,citrus:1}],
-    ['🍎','잘 익은 사과 냄새',{fruit:2,floral:1}] ]},
+    ['🌧️','비 온 뒤 숲에서 나는 냄새',{woody:2,citrus:1}] ]},
   { q:'손 씻을 비누를 고른다면?', a:[
-    ['🍋','새콤한 레몬 비누',{citrus:2,soap:1}],
-    ['🌹','향긋한 장미 비누',{floral:2,fruit:1}],
+    ['🍋','새콤달콤 레몬·딸기 비누',{citrus:2,woody:1}],
+    ['🌹','향긋한 장미 비누',{floral:2,citrus:1}],
     ['👶','아기 로션 같은 보송보송 비누',{soap:2,floral:1}],
-    ['🌳','숲 냄새 나는 편백나무 비누',{woody:2,soap:1}],
-    ['🍓','달콤한 딸기 비누',{fruit:2,floral:1}] ]},
+    ['🌳','숲 냄새 나는 편백나무 비누',{woody:2,soap:1}] ]},
   { q:'먹고 싶은 사탕 맛은?', a:[
-    ['🍋','새콤한 레몬 맛',{citrus:2}],
-    ['🍯','꽃에서 딴 꿀 맛',{floral:2,fruit:1}],
+    ['🍑','새콤달콤 과일 맛',{citrus:2,floral:1}],
+    ['🍯','꽃에서 딴 꿀 맛',{floral:2,citrus:1}],
     ['🥛','부드러운 우유 맛',{soap:2,woody:1}],
-    ['🌰','고소한 군밤 맛',{woody:2}],
-    ['🍑','달콤한 복숭아 맛',{fruit:2,citrus:1}] ]},
+    ['🌰','고소한 군밤 맛',{woody:2,soap:1}] ]},
   { q:'봉화에서 맡아 본 냄새 중에 제일 좋은 건?', a:[
-    ['🌲','소나무 숲 냄새',{woody:2,citrus:1}],
-    ['🍎','가을 사과밭 냄새',{fruit:2,floral:1}],
-    ['🌼','봄에 핀 아카시아꽃 냄새',{floral:2,fruit:1}],
-    ['👕','바람에 마른 빨래 냄새',{soap:2,citrus:1}],
-    ['🍵','따뜻한 유자차 냄새',{citrus:2,fruit:1}] ]},
+    ['🍎','가을 사과밭 냄새',{citrus:2,floral:1}],
+    ['🌼','봄에 핀 아카시아꽃 냄새',{floral:2,soap:1}],
+    ['👕','바람에 마른 빨래 냄새',{soap:2,woody:1}],
+    ['🌲','소나무 숲 냄새',{woody:2,citrus:1}] ]},
   { q:'내가 좋아하는 향은 어떤 느낌?', a:[
-    ['⚡','톡 쏘고 상쾌한 향',{citrus:2,soap:1}],
-    ['🎀','화사하고 예쁜 향',{floral:2,fruit:1}],
-    ['☁️','은은하고 포근한 향',{soap:2,floral:1}],
-    ['🪵','차분하고 묵직한 향',{woody:2,soap:1}],
-    ['🍬','달콤하고 진한 향',{fruit:2,floral:1}] ]},
+    ['⚡','톡 쏘고 달콤한 향',{citrus:2,floral:1}],
+    ['🎀','화사하고 예쁜 향',{floral:2,citrus:1}],
+    ['☁️','은은하고 포근한 향',{soap:2,woody:1}],
+    ['🪵','차분하고 묵직한 향',{woody:2,soap:1}] ]},
   { q:'냄새가 좋아서 들어가 보고 싶은 가게는?', a:[
-    ['🧃','오렌지 주스 가게',{citrus:2,fruit:1}],
-    ['💐','꽃집',{floral:2,soap:1}],
-    ['🫧','보송보송 빨래방',{soap:2,citrus:1}],
-    ['🪚','나무 냄새 나는 목공방',{woody:2}],
-    ['🍰','과일 케이크 가게',{fruit:2,floral:1}] ]},
+    ['🧃','과일 주스 가게',{citrus:2,soap:1}],
+    ['💐','꽃집',{floral:2,woody:1}],
+    ['🫧','보송보송 빨래방',{soap:2,floral:1}],
+    ['🪚','나무 냄새 나는 목공방',{woody:2,citrus:1}] ]},
   { q:'향수를 뿌렸을 때 친구가 이렇게 말해 주면 좋겠어!', a:[
-    ['😆','“너한테 상큼한 냄새 나!”',{citrus:2,fruit:1}],
-    ['🥰','“너한테 꽃향기 나!”',{floral:2,fruit:1}],
+    ['😆','“너한테 상큼달콤한 냄새 나!”',{citrus:2,floral:1}],
+    ['🥰','“너한테 꽃향기 나!”',{floral:2,citrus:1}],
     ['😊','“너한테 깨끗한 냄새 나!”',{soap:2,woody:1}],
-    ['😌','“숲에 온 것처럼 편안해!”',{woody:2,soap:1}],
-    ['🤤','“너한테 달콤한 냄새 나!”',{fruit:2,citrus:1}] ]}
+    ['😌','“숲에 온 것처럼 편안해!”',{woody:2,soap:1}] ]}
 ];
 
 /* ===================== 그림 & 효과 ===================== */
@@ -434,29 +434,35 @@ function saveStats(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); 
 function escapeHTML(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ===================== 진행 ===================== */
-let answers=[], qi=0, shuffled=[], locked=false;
+let answers=[], qi=0, shuffled=[], locked=false, mode=null;
 const CARD_COLORS=['#FFD27A','#FFB3D0','#A9DBFF','#D9B896','#FFA79F'];
+
+/* 마지막 단계: 향수를 직접 만들지, 완성된 향수를 받아 갈지 (점수에는 안 들어감) */
+const MODES=[
+  ['🧪','내가 직접 만들래!','향기 원액을 섞어서 나만의 향수 만들기','make'],
+  ['🎁','완성된 향수 받을래!','내 향기 요정 향수를 바로 받아 가기','take'] ];
+const MAKE_DROPS=10;  // 직접 만들기: 원액을 모두 몇 방울 넣는지
 
 $('startBtn').onclick=()=>{
   sfx.start();
-  answers=new Array(QUESTIONS.length).fill(null);
+  answers=new Array(QUESTIONS.length).fill(null); mode=null;
   shuffled=QUESTIONS.map(q=>shuffle(q.a));
   qi=0; renderQ(); show('quiz');
 };
 
 function renderQ(){
-  const total=QUESTIONS.length, p=qi/total*100;
-  $('qnum').textContent=`${qi+1}번째 질문 (${qi+1}/${total})`;
-  $('qtext').textContent=QUESTIONS[qi].q;
+  const total=QUESTIONS.length+1, p=qi/total*100, choice=qi===QUESTIONS.length;
+  $('qnum').textContent=choice?`마지막 질문! (${total}/${total})`:`${qi+1}번째 질문 (${qi+1}/${total})`;
+  $('qtext').textContent=choice?'향수는 어떻게 할까?':QUESTIONS[qi].q;
   $('fill').style.width=p+'%'; $('runner').style.left=Math.max(p,3)+'%';
   $('backBtn').disabled=qi===0;
   const box=$('options'); box.innerHTML='';
-  shuffled[qi].forEach((opt,i)=>{
+  (choice?MODES:shuffled[qi]).forEach((opt,i)=>{
     const b=document.createElement('button');
-    b.className='opt'+(answers[qi]===opt?' picked':'');
-    b.style.setProperty('--c',CARD_COLORS[i%CARD_COLORS.length]);
+    b.className='opt'+((choice?mode===opt[3]:answers[qi]===opt)?' picked':'')+(choice?' mode':'');
+    b.style.setProperty('--c',CARD_COLORS[(choice?i*2:i)%CARD_COLORS.length]);
     b.style.animationDelay=(i*0.08)+'s';
-    b.innerHTML=`<span class="em" style="animation-delay:${i*0.3}s">${opt[0]}</span><span>${opt[1]}</span>`;
+    b.innerHTML=`<span class="em" style="animation-delay:${i*0.3}s">${opt[0]}</span><span>${opt[1]}</span>${choice?`<small>${opt[2]}</small>`:''}`;
     b.onclick=()=>pick(opt,b);
     box.appendChild(b);
   });
@@ -465,12 +471,12 @@ function renderQ(){
 }
 function pick(opt,el){
   if(locked) return; locked=true; sfx.pop();
-  answers[qi]=opt;
+  if(qi===QUESTIONS.length) mode=opt[3]; else answers[qi]=opt;
   document.querySelectorAll('.opt').forEach(o=>o.classList.remove('picked'));
   el.classList.add('picked');
   setTimeout(()=>{
     locked=false;
-    if(qi<QUESTIONS.length-1){ qi++; renderQ(); }
+    if(qi<QUESTIONS.length){ qi++; renderQ(); }
     else { $('fill').style.width='100%'; $('runner').style.left='100%'; setTimeout(startBlend,300); }
   },520);
 }
@@ -478,10 +484,10 @@ $('backBtn').onclick=()=>{ if(qi>0){ qi--; renderQ(); } };
 
 /* ===================== 결과 계산 ===================== */
 function calc(){
-  const score={citrus:0,floral:0,soap:0,woody:0,fruit:0}, firsts={citrus:0,floral:0,soap:0,woody:0,fruit:0};
+  const score={}, firsts={}; ORDER.forEach(k=>{score[k]=0;firsts[k]=0;});
   answers.forEach(a=>{ for(const k in a[2]){ score[k]+=a[2][k]; if(a[2][k]===2) firsts[k]++; } });
   const rank=shuffle(ORDER).sort((x,y)=>(score[y]-score[x])||(firsts[y]-firsts[x]));
-  const sum=Object.values(score).reduce((p,c)=>p+c,0);
+  const sum=ORDER.reduce((p,k)=>p+score[k],0);
   return {score,rank,sum};
 }
 
@@ -513,8 +519,29 @@ function startBlend(){
 function showResult(score,rank,sum){
   const main=SCENTS[rank[0]], sub=SCENTS[rank[1]];
 
-  const st=loadStats(); st[rank[0]]=(st[rank[0]]||0)+1; saveStats(st);
+  const st=loadStats(); st[rank[0]]=(st[rank[0]]||0)+1; st[mode+'_'+rank[0]]=(st[mode+'_'+rank[0]]||0)+1; saveStats(st);
   const pct=k=>Math.round(score[k]/sum*100);
+  // 직접 만들기 레시피: 1·2등 향 점수 비율대로 방울 수 나누기 (최소 6:4 ~ 최대 9:1)
+  let d1=Math.round(score[rank[0]]/(score[rank[0]]+score[rank[1]])*MAKE_DROPS);
+  d1=Math.min(MAKE_DROPS-1,Math.max(Math.ceil(MAKE_DROPS*0.6),d1));
+  const d2=MAKE_DROPS-d1;
+  const dots=(s,n)=>Array.from({length:n},(_,i)=>`<i style="background:${s.color};animation-delay:${1.2+i*0.08}s"></i>`).join('');
+  const pickup = mode==='make'
+    ? `<div class="pickup">
+        <div class="no">🧪</div>
+        <div><b>나만의 향수를 직접 만들어요!</b><small>이 화면을 언니·오빠들에게 보여 주고 레시피대로 섞어 봐</small></div>
+      </div>
+      <div class="card recipe" style="animation-delay:1s"><h3>📝 뿌뿌의 비밀 레시피</h3>
+        <div class="step"><span class="num" style="background:${main.color}">${main.no}</span>
+          <div><b>${main.no}번 ${main.name}</b><div class="drops">${dots(main,d1)}</div></div><span class="cnt" style="color:${main.color}">${d1}방울</span></div>
+        <div class="step"><span class="num" style="background:${sub.color}">${sub.no}</span>
+          <div><b>${sub.no}번 ${sub.name}</b><div class="drops">${dots(sub,d2)}</div></div><span class="cnt" style="color:${sub.color}">${d2}방울</span></div>
+        <p class="tip">${main.emoji} 내 향기를 많이, ${sub.emoji} 단짝 향기를 조금 넣고 살살 흔들면 완성!</p>
+      </div>`
+    : `<div class="pickup">
+        <div class="no">${main.no}</div>
+        <div><b>${main.no}번 ${main.name} 향수를 받아 가요! 🎁</b><small>이 화면을 언니·오빠들에게 보여 줘</small></div>
+      </div>`;
   const el=$('result');
   el.style.setProperty('--tone',main.color); el.style.setProperty('--soft',main.soft);
   el.innerHTML=`
@@ -526,10 +553,7 @@ function showResult(score,rank,sum){
       <div class="title">“${main.title}”</div>
       <div class="tags">${main.mood.map((m,i)=>`<span style="animation-delay:${0.8+i*0.15}s">#${m}</span>`).join('')}</div>
     </div>
-    <div class="pickup">
-      <div class="no">${main.no}</div>
-      <div><b>${main.no}번 ${main.name} 향수를 받아 가요! 🎁</b><small>이 화면을 언니·오빠들에게 보여 줘</small></div>
-    </div>
+    ${pickup}
     <div class="card" style="animation-delay:1.1s"><h3>💌 뿌뿌가 알려 줄게</h3><p>${main.desc}</p></div>
     <div class="card" style="animation-delay:1.25s"><h3>🧪 이런 향이 들어 있어</h3>
       <div class="notes">${main.notes.map(n=>`<span>${n}</span>`).join('')}</div></div>
@@ -666,8 +690,9 @@ $('secret').addEventListener('click',()=>{ taps++; clearTimeout(tapTimer); tapTi
 function openStats(){
   const st=loadStats(); let total=0;
   $('statRows').innerHTML=ORDER.map(k=>{ const n=st[k]||0; total+=n;
-    return `<div class="row"><span>${SCENTS[k].no}번 ${SCENTS[k].emoji} ${SCENTS[k].name}</span><b>${n}명</b></div>`; }).join('')
+    return `<div class="row"><span>${SCENTS[k].no}번 ${SCENTS[k].emoji} ${SCENTS[k].name}</span><b>${n}명 <small style="color:var(--sub);font-weight:700">(받기 ${st['take_'+k]||0} · 만들기 ${st['make_'+k]||0})</small></b></div>`; }).join('')
     +`<div class="row"><span>향 찾기 합계</span><b>${total}명</b></div>`
+    +`<div class="row"><span>🎁 받아 가기 / 🧪 직접 만들기</span><b>${ORDER.reduce((p,k)=>p+(st['take_'+k]||0),0)} / ${ORDER.reduce((p,k)=>p+(st['make_'+k]||0),0)}명</b></div>`
     +`<div class="row"><span>과학 퀴즈 도전</span><b>${st.sciTry||0}번</b></div>`
     +`<div class="row"><span>간식 지급 (3개 이상)</span><b>${st.sciPass||0}명</b></div>`;
   $('stats').classList.add('show');

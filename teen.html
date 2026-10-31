@@ -9,7 +9,7 @@
     --paper:#FBF6FB; --paper-2:#F3ECF6; --card:rgba(255,255,255,.72);
     --ink:#3B3346; --ink-2:#5E5568; --mute:#9A8FA6; --hair:#E5DAEA;
     --pink:#EE8FB2; --pink-soft:#F9C9DA; --pink-deep:#D2577F;
-    --citrus:#D9A935; --floral:#D47F95; --soap:#6E9FC6; --woody:#9A7550; --fruit:#D0685C;
+    --citrus:#D98E35; --floral:#D47F95; --soap:#6E9FC6; --woody:#9A7550;
     --serif:Georgia,"Times New Roman",serif;
     --sans:"Malgun Gothic","맑은 고딕","Segoe UI",sans-serif;
   }
@@ -49,7 +49,7 @@
   .intro h1 em{font-style:italic;color:var(--ink-2)}
   .intro h2{font-size:clamp(26px,5vw,38px);font-weight:800;margin-top:18px;letter-spacing:-.02em}
   .intro .lead{margin-top:18px;font-size:clamp(16px,3.2vw,19px);line-height:1.8;color:var(--ink-2);max-width:520px;word-break:keep-all}
-  .families{display:grid;grid-template-columns:repeat(5,1fr);margin:40px 0 36px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+  .families{display:grid;grid-template-columns:repeat(4,1fr);margin:40px 0 36px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
   .families div{padding:18px 6px 16px;text-align:center;border-right:1px solid var(--hair);display:flex;flex-direction:column;align-items:center;gap:8px}
   .families div:last-child{border-right:none}
   .families svg{width:34px;height:34px}
@@ -102,7 +102,7 @@
     .qblock{grid-template-columns:1fr}
     .qno{font-size:56px}
     .families .e,.families .n{display:none}
-    .families .k{font-size:12.5px;letter-spacing:-.04em;white-space:nowrap}
+    .families .k{font-size:12.5px;letter-spacing:-.04em;line-height:1.3;word-break:keep-all}
     .families svg{width:28px;height:28px}
     header .cap{letter-spacing:.12em;font-size:10px;text-align:right}
     .cap{letter-spacing:.18em}
@@ -373,7 +373,7 @@
           <div class="cap eyebrow reveal">Personal Scent Profiling · No. 2026</div>
           <h1 class="en reveal" style="animation-delay:.1s">Find your<br><em>own scent.</em></h1>
           <h2 class="reveal" style="animation-delay:.2s">퍼스널 향찾기</h2>
-          <p class="lead reveal" style="animation-delay:.3s">여덟 가지 질문으로 당신의 후각 취향을 분석해 <br>다섯 가지 향 계열 중 가장 잘 어울리는 향과 분위기를 찾아 드립니다.</p>
+          <p class="lead reveal" style="animation-delay:.3s">여덟 가지 질문으로 당신의 후각 취향을 분석해 <br>네 가지 향 계열 중 가장 잘 어울리는 향과 분위기를 찾아 드립니다.</p>
         </div>
         <div class="hero-art reveal" style="animation-delay:.25s" id="heroArt"></div>
       </div>
@@ -407,7 +407,7 @@
       <div style="position:relative" id="abox"></div>
       <div class="cap">Analyzing olfactive profile</div>
       <h3>Blending your notes…</h3>
-      <p>응답을 바탕으로 다섯 가지 향 계열의 선호도를 계산하고 있습니다.</p>
+      <p>응답을 바탕으로 네 가지 향 계열의 선호도를 계산하고 있습니다.</p>
       <div id="arows"></div>
       <div class="scanline"></div>
     </section>
@@ -456,11 +456,10 @@
 <script>
 /* ===================== 아이콘 (단선 일러스트) ===================== */
 const ICON = {
-  citrus:'<circle cx="16" cy="16" r="13"/><circle cx="16" cy="16" r="10"/><path d="M16 6v20M7.3 11l17.4 10M7.3 21l17.4-10"/>',
+  citrus:'<circle cx="13" cy="19" r="11"/><circle cx="13" cy="19" r="8"/><path d="M13 11v16M6 15l14 8M6 23l14-8"/><circle cx="25" cy="10" r="4.5"/><path d="M25 5.5c0-2 1-3.5 3-4.5"/>',
   floral:'<circle cx="16" cy="16" r="3"/><ellipse cx="16" cy="8" rx="4" ry="6"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(72 16 16)"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(144 16 16)"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(216 16 16)"/><ellipse cx="16" cy="8" rx="4" ry="6" transform="rotate(288 16 16)"/>',
   soap:'<circle cx="12" cy="18" r="8"/><circle cx="23" cy="10" r="5"/><circle cx="24" cy="23" r="3"/><path d="M8 14.5a5 5 0 0 1 4-2.5"/>',
-  woody:'<circle cx="16" cy="16" r="13"/><circle cx="16.5" cy="16.5" r="9"/><circle cx="17" cy="17" r="5"/><circle cx="17.3" cy="17.3" r="1.6"/><path d="M16 3l1.5 6"/>',
-  fruit:'<circle cx="10" cy="22" r="6"/><circle cx="22" cy="22" r="6"/><path d="M10 16c2-6 6-10 8-12M22 16c-1-5-2-9-4-12"/><path d="M18 4c4-1 8 1 9 4-4 1-7 0-9-4z"/>'
+  woody:'<circle cx="16" cy="16" r="13"/><circle cx="16.5" cy="16.5" r="9"/><circle cx="17" cy="17" r="5"/><circle cx="17.3" cy="17.3" r="1.6"/><path d="M16 3l1.5 6"/>'
 };
 function icon(k, color){ return `<svg viewBox="0 0 32 32" fill="none" stroke="${color||'currentColor'}" stroke-width="1.3" stroke-linecap="round">${ICON[k]}</svg>`; }
 
@@ -511,12 +510,12 @@ const SPARK='<svg class="sparkle" viewBox="0 0 16 16"><path d="M8 0 L9.5 6.5 L16
 
 /* ===================== 향 계열 정보 ===================== */
 const SCENTS = {
-  citrus:{ no:1, name:'시트러스', en:'Citrus', color:'#C29A2B', soft:'#F4EBD2',
-    tagline:'햇살처럼 맑고 경쾌한 첫인상', mood:['상큼한','활기찬','긍정적인','산뜻한'],
-    family:'레몬·오렌지·자몽 같은 감귤류 껍질에서 얻는 향 계열이에요. 분자가 가볍고 휘발성이 높아 뿌리는 순간 가장 먼저 퍼지며, 향수의 <b>첫인상(탑 노트)</b>을 책임집니다.',
-    persona:'상큼하고 가벼운 향에 끌리는 사람은 대체로 <b>밝고 에너지가 넘치는 분위기</b>를 가지고 있어요. 새로운 것에 먼저 다가가고, 함께 있으면 주변까지 환해지는 비타민 같은 존재예요.',
-    top:['베르가못','레몬','자몽'], mid:['네롤리','그린티'], base:['화이트 머스크','베티버'],
-    axes:[1,1,3], when:'등교하는 아침, 시험 전 기분 전환, 운동 전후' },
+  citrus:{ no:1, name:'시트러스 & 프루트', en:'Citrus & Fruity', color:'#C27A2B', soft:'#F5E7D6',
+    tagline:'햇살처럼 상큼하고 과일처럼 달콤한 매력', mood:['상큼한','달콤한','활기찬','사랑스러운'],
+    family:'레몬·오렌지·자몽 같은 감귤류 껍질의 상큼함과 복숭아·베리·사과 같은 과일 과육의 달콤함을 함께 담은 향 계열이에요. 분자가 가볍고 휘발성이 높아 뿌리는 순간 가장 먼저 퍼지며, 향수의 <b>첫인상(탑 노트)</b>을 밝고 생기 있게 만듭니다.',
+    persona:'상큼하고 달콤한 과일 향에 끌리는 사람은 <b>밝고 에너지가 넘치는 분위기</b>를 가지고 있어요. 표현이 솔직하고 새로운 것에 먼저 다가가며, 함께 있으면 주변까지 환해지는 비타민 같은 존재예요.',
+    top:['베르가못','레몬','자몽'], mid:['복숭아','라즈베리','네롤리'], base:['화이트 머스크','바닐라'],
+    axes:[1,2,4], when:'등교하는 아침, 친구들과 놀러 갈 때, 기분 전환이 필요할 때' },
   floral:{ no:2, name:'플로럴', en:'Floral', color:'#B9707F', soft:'#F4E3E5',
     tagline:'꽃잎처럼 섬세하고 다정한 분위기', mood:['화사한','다정한','섬세한','우아한'],
     family:'장미·자스민·프리지아 같은 꽃에서 영감을 받은 향 계열로, 향수에서 가장 오래되고 다양한 계열이에요. 주로 <b>향의 심장(미들 노트)</b>을 이루며 풍성하고 부드럽게 퍼집니다.',
@@ -534,67 +533,53 @@ const SCENTS = {
     family:'편백·시더우드·샌달우드 같은 나무와 흙, 이끼의 향 계열이에요. 분자가 무겁고 천천히 날아가서 <b>향의 바탕(베이스 노트)</b>을 이루며, 시간이 지날수록 따뜻하게 깊어집니다.',
     persona:'나무 향에 끌리는 사람은 <b>차분하고 생각이 깊은 분위기</b>를 가지고 있어요. 자기만의 세계가 뚜렷하고, 친구들이 고민을 털어놓고 싶어 하는 든든한 사람이에요.',
     top:['사이프러스','카다멈'], mid:['편백','시더우드'], base:['샌달우드','베티버'],
-    axes:[5,4,2], when:'공부·독서에 집중할 때, 혼자만의 시간, 가을' },
-  fruit:{ no:5, name:'프루트', en:'Fruity', color:'#AE4F45', soft:'#F2E0DC',
-    tagline:'잘 익은 과일처럼 달콤하고 생기 있는 매력', mood:['달콤한','발랄한','사랑스러운','생기 있는'],
-    family:'복숭아·베리·사과 같은 과일 과육을 표현한 향 계열이에요. 시트러스보다 <b>달콤하고 즙이 많은 느낌</b>이 특징이며, 밝고 친근한 인상을 줍니다.',
-    persona:'달콤한 과일 향에 끌리는 사람은 <b>유쾌하고 사랑스러운 분위기</b>를 가지고 있어요. 표현이 솔직하고 풍부해서 어디서든 분위기를 띄우는 사람이에요.',
-    top:['블랙커런트','배'], mid:['복숭아','라즈베리'], base:['바닐라','머스크'],
-    axes:[2,3,5], when:'친구들과 놀러 갈 때, 축제, 기분 전환' }
+    axes:[5,4,2], when:'공부·독서에 집중할 때, 혼자만의 시간, 가을' }
 };
-const ORDER = ['citrus','floral','soap','woody','fruit'];
+const ORDER = ['citrus','floral','soap','woody'];
 const AXES = [['가벼운','묵직한'],['시원한','따뜻한'],['은은한','화려한']];
 
 /* ===================== 질문 (주 계열 2점, 보조 계열 1점) ===================== */
 const QUESTIONS = [
   { cat:'Olfactive Memory · 향의 기억', q:'맡으면 기분이 좋아지는 냄새는?', a:[
-    ['귤껍질을 깔 때 확 퍼지는 냄새',{citrus:2,fruit:1}],
-    ['꽃집 앞을 지날 때 나는 냄새',{floral:2,soap:1}],
+    ['귤껍질을 깔 때나 복숭아를 자를 때 퍼지는 냄새',{citrus:2,floral:1}],
+    ['꽃집 앞을 지날 때 나는 냄새',{floral:2,woody:1}],
     ['갓 세탁해서 말린 옷 냄새',{soap:2,woody:1}],
-    ['비 온 뒤 숲길의 흙과 나무 냄새',{woody:2,citrus:1}],
-    ['잘 익은 복숭아를 자를 때 나는 냄새',{fruit:2,floral:1}] ]},
+    ['비 온 뒤 숲길의 흙과 나무 냄새',{woody:2,citrus:1}] ]},
   { cat:'Daily Scent · 일상의 향', q:'샴푸나 바디워시를 고른다면 어떤 향?', a:[
-    ['레몬·자몽처럼 상큼한 향',{citrus:2,soap:1}],
-    ['장미·벚꽃처럼 화사한 향',{floral:2,fruit:1}],
+    ['자몽·피치처럼 상큼달콤한 향',{citrus:2,floral:1}],
+    ['장미·벚꽃처럼 화사한 향',{floral:2,citrus:1}],
     ['코튼·베이비파우더처럼 보송한 향',{soap:2,floral:1}],
-    ['편백·시더우드처럼 차분한 향',{woody:2,soap:1}],
-    ['피치·베리처럼 달콤한 향',{fruit:2,floral:1}] ]},
+    ['편백·시더우드처럼 차분한 향',{woody:2,soap:1}] ]},
   { cat:'Taste & Aroma · 맛과 향', q:'좋아하는 차나 음료의 향은?', a:[
-    ['유자차·레모네이드',{citrus:2,fruit:1}],
+    ['유자차·복숭아 아이스티',{citrus:2,floral:1}],
     ['캐모마일·꽃차',{floral:2,woody:1}],
     ['부드러운 밀크티·우유',{soap:2,woody:1}],
-    ['구수한 보리차·누룽지',{woody:2,soap:1}],
-    ['복숭아 아이스티',{fruit:2,citrus:1}] ]},
+    ['구수한 보리차·누룽지',{woody:2,soap:1}] ]},
   { cat:'Local Scent · 봉화의 향', q:'봉화에서 맡아 본 냄새 중 가장 좋은 것은?', a:[
-    ['소나무(춘양목) 숲 냄새',{woody:2,citrus:1}],
-    ['가을 사과밭의 달콤한 냄새',{fruit:2,floral:1}],
-    ['봄에 핀 아카시아꽃 냄새',{floral:2,fruit:1}],
-    ['햇볕과 바람에 마른 빨래 냄새',{soap:2,citrus:1}],
-    ['겨울에 끓인 유자차 냄새',{citrus:2,fruit:1}] ]},
+    ['가을 사과밭의 새콤달콤한 냄새',{citrus:2,floral:1}],
+    ['봄에 핀 아카시아꽃 냄새',{floral:2,citrus:1}],
+    ['햇볕과 바람에 마른 빨래 냄새',{soap:2,woody:1}],
+    ['소나무(춘양목) 숲 냄새',{woody:2,citrus:1}] ]},
   { cat:'Character · 향의 성격', q:'내가 끌리는 향의 느낌은?', a:[
-    ['톡 쏘고 시원하게 상쾌한 향',{citrus:2,soap:1}],
-    ['화사하고 우아한 향',{floral:2,fruit:1}],
+    ['톡 쏘고 상큼하면서 달콤한 향',{citrus:2,soap:1}],
+    ['화사하고 우아한 향',{floral:2,citrus:1}],
     ['은은하고 살결처럼 포근한 향',{soap:2,floral:1}],
-    ['차분하고 깊이 있는 향',{woody:2,soap:1}],
-    ['달콤하고 존재감 있는 향',{fruit:2,floral:1}] ]},
+    ['차분하고 깊이 있는 향',{woody:2,soap:1}] ]},
   { cat:'Dry Down · 잔향', q:'향이 사라질 때 남았으면 하는 잔향은?', a:[
-    ['상쾌함만 살짝 남고 깔끔하게 사라지는 향',{citrus:2,soap:1}],
-    ['은은한 꽃내음이 오래 맴도는 향',{floral:2,soap:1}],
+    ['상큼달콤함이 살짝 남고 가볍게 사라지는 향',{citrus:2,soap:1}],
+    ['은은한 꽃내음이 오래 맴도는 향',{floral:2,woody:1}],
     ['피부에 스며든 듯 포근하게 남는 향',{soap:2,woody:1}],
-    ['따뜻하고 묵직하게 깔리는 나무 향',{woody:2,fruit:1}],
-    ['달콤함이 오래 남는 향',{fruit:2,woody:1}] ]},
+    ['따뜻하고 묵직하게 깔리는 나무 향',{woody:2,citrus:1}] ]},
   { cat:'Ambience · 공간의 향', q:'방에 향초를 하나 켠다면?', a:[
-    ['레몬그라스 · 오렌지',{citrus:2,woody:1}],
+    ['오렌지 · 애플',{citrus:2,woody:1}],
     ['라벤더 · 로즈',{floral:2,soap:1}],
     ['클린 코튼 · 화이트 머스크',{soap:2,floral:1}],
-    ['샌달우드 · 시더우드',{woody:2,soap:1}],
-    ['애플 · 블랙베리',{fruit:2,citrus:1}] ]},
+    ['샌달우드 · 시더우드',{woody:2,citrus:1}] ]},
   { cat:'Impression · 남기고 싶은 인상', q:'향수를 뿌렸을 때 듣고 싶은 말은?', a:[
-    ['“너한테서 상큼한 향이 나.”',{citrus:2,fruit:1}],
-    ['“꽃향기 같은 좋은 냄새가 나.”',{floral:2,fruit:1}],
+    ['“너한테서 상큼달콤한 향이 나.”',{citrus:2,floral:1}],
+    ['“꽃향기 같은 좋은 냄새가 나.”',{floral:2,soap:1}],
     ['“막 씻고 나온 것처럼 깨끗해.”',{soap:2,citrus:1}],
-    ['“숲에 온 것처럼 편안해져.”',{woody:2,soap:1}],
-    ['“달콤한 냄새 나, 무슨 향수야?”',{fruit:2,floral:1}] ]}
+    ['“숲에 온 것처럼 편안해져.”',{woody:2,soap:1}] ]}
 ];
 
 /* ===================== 유틸 ===================== */
@@ -608,7 +593,7 @@ function saveStats(s){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); 
 
 /* ===================== 시작 화면 ===================== */
 $('families').innerHTML = ORDER.map(k=>{ const s=SCENTS[k];
-  return `<div>${icon(k,s.color)}<span class="n">No.${pad(s.no)}</span><span class="k">${s.name.replace(' & ','&')}</span><span class="e en">${s.en}</span></div>`; }).join('');
+  return `<div>${icon(k,s.color)}<span class="n">No.${pad(s.no)}</span><span class="k">${s.name.replace(' & ','&<wbr>')}</span><span class="e en">${s.en}</span></div>`; }).join('');
 $('rail').innerHTML = QUESTIONS.map(()=>'<i></i>').join('');
 
 // 시작 화면 히어로: 향수병 + 둥둥 떠다니는 향 재료 + 반짝이
@@ -716,7 +701,7 @@ function countUp(el,to,dur,suf){
 
 /* ===================== 레이더 차트 ===================== */
 function radarSVG(pct, tone){
-  const cx=180, cy=170, R=120, n=5;
+  const cx=180, cy=170, R=120, n=ORDER.length;
   const max=Math.max(...ORDER.map(k=>pct[k]),1);
   const pt=(i,r)=>{ const a=-Math.PI/2+i*2*Math.PI/n; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; };
   let grid='';
@@ -749,7 +734,7 @@ function showReport({rank,pct}){
     <div class="flip reveal" style="animation-delay:.15s" id="flip">
      <div class="flip-inner">
       <div class="cover" id="cover">
-        <div class="pat">${Array.from({length:18},(_,i)=>icon(ORDER[i%5],'#fff')).join('')}</div>
+        <div class="pat">${Array.from({length:18},(_,i)=>icon(ORDER[i%ORDER.length],'#fff')).join('')}</div>
         <div class="cap" style="position:relative;color:var(--ink-2)">Your scent is…</div>
         <div class="q">?</div>
         <div class="t">나의 향 카드가 도착했어요</div>
