@@ -529,7 +529,7 @@ function showResult(score,rank,sum){
   const pickup = mode==='make'
     ? `<div class="pickup">
         <div class="no">🧪</div>
-        <div><b>나만의 향수를 직접 만들어요!</b><small>이 화면을 언니·오빠들에게 보여 주고 레시피대로 섞어 봐</small></div>
+        <div><b>나만의 향수를 직접 만들어요!</b><small>이 화면을 언니·누나들에게 보여 주고 레시피대로 섞어 봐</small></div>
       </div>
       <div class="card recipe" style="animation-delay:1s"><h3>📝 뿌뿌의 비밀 레시피</h3>
         <div class="step"><span class="num" style="background:${main.color}">${main.no}</span>
@@ -540,7 +540,7 @@ function showResult(score,rank,sum){
       </div>`
     : `<div class="pickup">
         <div class="no">${main.no}</div>
-        <div><b>${main.no}번 ${main.name} 향수를 받아 가요! 🎁</b><small>이 화면을 언니·오빠들에게 보여 줘</small></div>
+        <div><b>${main.no}번 ${main.name} 향수를 받아 가요! 🎁</b><small>이 화면을 언니·누나들에게 보여 줘</small></div>
       </div>`;
   const el=$('result');
   el.style.setProperty('--tone',main.color); el.style.setProperty('--soft',main.soft);
@@ -665,7 +665,7 @@ function sciResult(){
            <div class="title">“${SCI_PASS}개 이상 맞히면 간식을 받을 수 있어!”</div>`}
     </div>
     ${pass
-      ? `<div class="pickup"><div class="no">🎁</div><div><b>간식을 받아 가요!</b><small>이 화면을 언니·오빠들에게 보여 줘</small></div></div>`
+      ? `<div class="pickup"><div class="no">🎁</div><div><b>간식을 받아 가요!</b><small>이 화면을 언니·누나들에게 보여 줘</small></div></div>`
       : `<div class="pickup"><div class="no">💪</div><div><b>다시 도전해 볼까?</b><small>문제가 새로 바뀌어!</small></div></div>`}
     <div class="card"><h3>💡 오늘 배운 향기 과학</h3><p>냄새가 멀리 퍼지는 건 <b>확산</b>, 향수가 날아가는 건 <b>증발</b>, 냄새를 맡는 건 <b>코 속 세포</b> 덕분이야!</p></div>
     <div class="actions">${pass?'':'<button class="btn sci" id="sciRetry">다시 도전 🔄</button>'}<button class="btn" id="sciHome2">처음으로 🏠</button></div>`;
